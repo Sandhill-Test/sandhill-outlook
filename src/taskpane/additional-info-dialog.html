@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Additional Information</title>
+    <script
+      type="text/javascript"
+      src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://res-1.cdn.office.net/files/fabric-cdn-prod_20230815.002/office-ui-fabric-core/11.1.0/css/fabric.min.css"
+    />
+    <style>
+      body {
+        /* background: #1f1f1f; */
+        color: #ffffff;
+        margin: 0;
+        padding: 20px;
+      }
+      h2 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #444;
+        padding-bottom: 10px;
+        color: #ffffff;
+      }
+      .info-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 12px;
+        align-items: flex-start;
+      }
+      .info-label {
+        font-weight: bold;
+        min-width: 100px;
+        flex-shrink: 0;
+        color: #ffffff;
+      }
+      .info-value {
+        color: #ffffff;
+      }
+      a.info-value {
+        color: #4da3ff;
+        text-decoration: none;
+      }
+      a.info-value:hover {
+        text-decoration: underline;
+      }
+      #close-btn {
+        margin-top: 20px;
+        padding: 8px 20px;
+        background-color: #0078d4;
+        color: white;
+        border: none;
+        border-radius: 2px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      #close-btn:hover {
+        background-color: #106ebe;
+      }
+    </style>
+  </head>
+  <body class="ms-Fabric">
+    <h2 class="ms-font-xl">Additional Information</h2>
+    <div id="info-container"></div>
+    <button id="close-btn">Close</button>
+  </body>
+</html>

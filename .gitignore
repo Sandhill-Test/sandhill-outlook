@@ -1,0 +1,14 @@
+# Dependency directories
+node_modules/
+#ignore connection db code
+/conn.js
+
+#ignore log files
+*.log
+
+#ignore temp folders
+temp/
+src/taskpane/conn.js
+
+docs/
+.vscode/
