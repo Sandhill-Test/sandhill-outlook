@@ -3,7 +3,7 @@
     "allowUnknownTags": false
   },
   "source": {
-    "include": ["src"],
+    "include": ["src", "../js"],
     "includePattern": "\\.js$",
     "excludePattern": "(node_modules/|docs)"
   },
@@ -19,5 +19,16 @@
   "templates": {
     "cleverLinks": false,
     "monospaceLinks": false
+  },
+
+  "docdash": {
+    "sort": [true],
+
+    "search": [true],
+    "collapse": [true],
+    "wrap": [true],
+    "typedefs": [true],
+    "navLevel": [1],
+    "scripts": []
   }
 }

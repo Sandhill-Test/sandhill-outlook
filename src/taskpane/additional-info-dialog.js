@@ -1,5 +1,14 @@
 /* global document, Office, localStorage */
+/**
+ * @module Dialog
+ * @description Additional info dialog behaviour and form handling.
+ */
 
+/**
+ * Initialises the additional-info dialog once the Office runtime is ready.
+ * Reads the `additionalInfoData` array from localStorage (written by the main taskpane before
+ * opening this dialog), renders each field as a labelled row, and wires up the close button.
+ */
 Office.onReady(() => {
   const data = JSON.parse(localStorage.getItem("additionalInfoData") || "[]");
   const container = document.getElementById("info-container");

@@ -4,7 +4,10 @@
  */
 
 /* global document, Office, localStorage */
-
+/**
+ * @module taskpane
+ * @description Main taskpane - data fetchng, page rendering, and navigation
+ */
 import { initFormatButtons } from "./format.js";
 
 // WARNING!!!!  WARNING!!!! WARNING!!!! WARNING!!!! WARNING!!!! WARNING!!!! WARNING!!!! WARNING!!!! WARNING!!!!
@@ -20,25 +23,27 @@ import { initFormatButtons } from "./format.js";
 // TODO: do smth about the back btn function cuz it works quite sloppy when editing and pressing back - check if i did smth about it cuz i cant remember
 
 // add a delete article function?
-/**
- * @type {Array} allSubpages - Contains every subpage
- * @type {Array} allPages - Contains every page
- * @type {*} [currentPageId="null"] - mutable variable to track which page is currently open
- * @type {*} [currentPageId="null"] - mutable variable to track which page is currently open
- * @type {*} [currentSubPageId="null"] - mutable variable to track which subpage is currently open
- */
+
+/** @type {Array<Object>} Contains every subpage fetched from the database */
 let allSubpages = [];
+
+/** @type {Array<Object>} Contains every page fetched from the database */
 let allPages = [];
+
+/** @type {number|null} Tracks which page is currently open; null if none */
 let currentPageId = null;
+
+/** @type {number|null} Tracks which subpage is currently open; null if none */
 let currentSubpageId = null;
 
 /**
- * @async testConnection - Collects the data from the Pages and Subpage tables in the database using fetch API. Attempts to connect to the database 7 times before throwing an error. If successfull, renderPage() will execute
- * @param {number} retries - The amount of retries it takes to connect
- * @param {number} delay - The wait between each connection attempt in miliseconds
- * @returns
+ * Collects data from the Pages and Subpage tables in the database using the Fetch API.
+ * Retries the connection up to `retries` times before logging an error. On success, calls {@link renderResults}.
+ * @async
+ * @param {number} [retries=7] - The number of connection attempts before giving up
+ * @param {number} [delay=2000] - The wait between each attempt in milliseconds
+ * @returns {Promise<void>}
  */
-
 async function testConnection(retries = 7, delay = 2000) {
   for (let i = 0; i < retries; i++) {
     try {
@@ -59,7 +64,7 @@ async function testConnection(retries = 7, delay = 2000) {
       return;
     } catch (err) {
       console.warn(
-        `Connection attempt ${i + 1} of ${retries} failed. Retrying in ${delay / 1000}s...`,
+        `Connection attempt ${i + 1} of ${retries} failed. Retrying in ${delay / 1000}s...`
       );
       await new Promise((res) => setTimeout(res, delay));
     }
@@ -68,9 +73,11 @@ async function testConnection(retries = 7, delay = 2000) {
 }
 
 /**
- * renderResults
- * @param {*} pages
- * @param {*} subpages
+ * Renders the list of pages and their top subpages on the main view.
+ * Each page is shown with up to 3 of its subpages listed beneath it.
+ * @param {Array<Object>} pages - Array of page objects from the database
+ * @param {Array<Object>} subpages - Array of subpage objects from the database
+ * @returns {void}
  */
 function renderResults(pages, subpages) {
   const mainListUl = document.getElementById("main-list-ul");
@@ -85,10 +92,7 @@ function renderResults(pages, subpages) {
 
     // creating the design for each section on the main page
     const subItems = topSubpage
-      .map(
-        (sp) =>
-          `<li><a href="${sp.Id != null ? "#subpage-" + sp.Id : ""}">${sp.title}</a></li>`,
-      )
+      .map((sp) => `<li><a href="${sp.Id != null ? "#subpage-" + sp.Id : ""}">${sp.title}</a></li>`)
       .join("");
 
     const listIcon =
@@ -117,9 +121,10 @@ function renderResults(pages, subpages) {
 }
 
 /**
- *
- * @param {*} id
- * @returns
+ * Fetches a single subpage record from the API by its ID.
+ * @async
+ * @param {number} id - The ID of the subpage to fetch
+ * @returns {Promise<Object|undefined>} The subpage object, or `undefined` if the request fails
  */
 async function subpageFetchUtil(id) {
   try {
@@ -133,8 +138,11 @@ async function subpageFetchUtil(id) {
 // FIXME: lol the search bar dont work for now.... probs will remove it later
 
 /**
- *
- * @param {*} id
+ * Renders the list view for a given page, displaying all of its subpages.
+ * Updates {@link currentPageId} and switches to the `searchpage-view`.
+ * @async
+ * @param {number} id - The ID of the parent page to display
+ * @returns {Promise<void>}
  */
 async function renderSearchList(id) {
   try {
@@ -155,6 +163,14 @@ async function renderSearchList(id) {
   } catch (err) {}
 }
 
+/**
+ * Fetches and renders a subpage in the subpage view by its ID.
+ * Populates all content fields (title, description, symptoms, solution, image),
+ * and wires up the edit button and additional-info dialog.
+ * @async
+ * @param {number} id - The ID of the subpage to render
+ * @returns {Promise<void>}
+ */
 async function renderSubpage(id) {
   try {
     currentSubpageId = id;
@@ -211,8 +227,7 @@ async function renderSubpage(id) {
         isLink: !!isLink,
       }));
 
-    document.getElementById("edit-btn").onclick = () =>
-      showFormView("edit", subpage);
+    document.getElementById("edit-btn").onclick = () => showFormView("edit", subpage);
 
     document.getElementById("additional-info").onclick = () => {
       localStorage.setItem("additionalInfoData", JSON.stringify(dialogData));
@@ -228,7 +243,7 @@ async function renderSubpage(id) {
           dialog.addEventHandler(Office.EventType.DialogMessageReceived, () => {
             dialog.close();
           });
-        },
+        }
       );
     };
 
@@ -238,31 +253,47 @@ async function renderSubpage(id) {
   }
 }
 
+/**
+ * Clears the URL hash, triggering the `hashchange` event to navigate back to the main view.
+ * @returns {void}
+ */
 function backButton() {
   window.location.hash = "";
 }
 
+/**
+ * Shows the specified view element and hides all others.
+ * @param {"main-view"|"searchpage-view"|"subpage-view"|"form-view"} viewId - The ID of the view to show
+ * @returns {void}
+ */
 function showView(viewId) {
-  ["main-view", "searchpage-view", "subpage-view", "form-view"].forEach(
-    (id) => {
-      document.getElementById(id).style.display =
-        id === viewId ? "block" : "none";
-    },
-  );
+  ["main-view", "searchpage-view", "subpage-view", "form-view"].forEach((id) => {
+    document.getElementById(id).style.display = id === viewId ? "block" : "none";
+  });
 }
 
+/**
+ * Convenience wrapper that switches the display to the main view.
+ * @returns {void}
+ */
 function showMainView() {
   showView("main-view");
 }
 
+/** @type {HTMLElement} The contenteditable element used as the WYSIWYG solution editor */
 const formSolution = document.getElementById("form-solution");
 
+/**
+ * Populates and displays the add/edit form view.
+ * Sets all form fields from the given subpage object (if editing) and wires up the submit and back buttons.
+ * @param {"add"|"edit"} mode - Whether the form is for adding a new entry or editing an existing one
+ * @param {Object|null} [subpage=null] - The subpage object to pre-populate form fields with (used in "edit" mode)
+ * @returns {void}
+ */
 function showFormView(mode, subpage = null) {
-  document.getElementById("form-title-el").innerText =
-    mode === "edit" ? "Edit Entry" : "Add Entry";
+  document.getElementById("form-title-el").innerText = mode === "edit" ? "Edit Entry" : "Add Entry";
   document.getElementById("form-title").value = subpage?.title ?? "";
-  document.getElementById("form-description").value =
-    subpage?.description ?? "";
+  document.getElementById("form-description").value = subpage?.description ?? "";
   document.getElementById("form-symptom").value = subpage?.symptom ?? "";
 
   formSolution.innerHTML = subpage?.solution ?? "";
@@ -272,8 +303,7 @@ function showFormView(mode, subpage = null) {
   document.getElementById("form-img").value = subpage?.img ?? "";
   document.getElementById("form-error").style.display = "none";
 
-  document.getElementById("form-submit-btn").onclick = () =>
-    submitForm(mode, subpage?.Id ?? null);
+  document.getElementById("form-submit-btn").onclick = () => submitForm(mode, subpage?.Id ?? null);
   document.getElementById("back-btn-form").onclick = () => {
     mode === "edit" ? showView("subpage-view") : showView("searchpage-view");
   };
@@ -282,6 +312,15 @@ function showFormView(mode, subpage = null) {
   showView("form-view");
 }
 
+/**
+ * Validates and submits the form data to the API.
+ * Sends a POST request in "add" mode or a PUT request in "edit" mode.
+ * On success, updates the local cache and navigates to the appropriate view.
+ * @async
+ * @param {"add"|"edit"} mode - Whether to create a new subpage or update an existing one
+ * @param {number|null} subpageId - The ID of the subpage to update (only used in "edit" mode)
+ * @returns {Promise<void>}
+ */
 async function submitForm(mode, subpageId) {
   const title = document.getElementById("form-title").value.trim();
   const errorEl = document.getElementById("form-error");
@@ -294,8 +333,7 @@ async function submitForm(mode, subpageId) {
 
   const body = {
     title,
-    description:
-      document.getElementById("form-description").value.trim() || null,
+    description: document.getElementById("form-description").value.trim() || null,
     symptom: document.getElementById("form-symptom").value.trim() || null,
 
     // FIXME:yeah look into this one rq
@@ -339,10 +377,21 @@ async function submitForm(mode, subpageId) {
 }
 
 // toggle util function cuz im tired of making an eventhandler for every single element
+/**
+ * Toggles the `hidden` CSS class on the element referenced by the clicked button's
+ * `data-toggle-target` attribute.
+ * @param {MouseEvent} e - The click event from the toggle button
+ * @returns {void}
+ */
 function toggleHidden(e) {
   const targetId = e.currentTarget.dataset.toggleTarget;
   document.getElementById(targetId)?.classList.toggle("hidden");
 }
+/**
+ * Attaches click event listeners to all elements with a `data-toggle-target` attribute,
+ * wiring them up to {@link toggleHidden}.
+ * @returns {void}
+ */
 function initToggleButtons() {
   document.querySelectorAll("[data-toggle-target]").forEach((btn) => {
     btn.addEventListener("click", toggleHidden);
