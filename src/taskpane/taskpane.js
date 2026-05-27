@@ -246,10 +246,28 @@ async function renderSubpage(id) {
         }
       );
     };
-
+    const pinIcon = document.getElementById("pin-icon");
+    pinIcon.className = `ms-Icon ${subpage.is_pinned ? "ms-Icon--PinnedSolid" : "ms-Icon--Pinned"} ms-font-xl`;
+    document.getElementById("pin-btn").onclick = () => pinSubpg(id);
     showView("subpage-view");
   } catch (err) {
     console.error("Failed to load subpage:", err);
+  }
+}
+
+async function pinSubpg(id) {
+  try {
+    const res = await fetch(`https://localhost:3001/api/subpages/${id}/pin`, {
+      method: "PATCH",
+    });
+    if (!res.ok) throw new Error("failed to toggle pin");
+    const updated = await res.json();
+    const pinned = !!updated.is_pinned;
+
+    const pinIcon = document.getElementById("pin-icon");
+    pinIcon.className = `ms-Icon ${pinned ? "ms-Icon--PinnedSolid" : "ms-Icon--Pinned"} ms-font-xl`;
+  } catch (err) {
+    console.error("pin toggle failed", err);
   }
 }
 
