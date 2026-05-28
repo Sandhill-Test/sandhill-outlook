@@ -1,6 +1,7 @@
 const devCerts = require("office-addin-dev-certs");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const path = require("path");
 
 async function getHttpsOptions() {
@@ -43,6 +44,10 @@ module.exports = async (env, options) => {
           use: "html-loader",
         },
         {
+          test: /\.css$/,
+          use: [MiniCssExtractPlugin.loader, "css-loader"],
+        },
+        {
           test: /\.(png|jpg|jpeg|gif|ico)$/,
           type: "asset/resource",
           generator: {
@@ -77,17 +82,28 @@ module.exports = async (env, options) => {
             from: "manifest.xml",
             to: "[name][ext]",
           },
+          { from: "node_modules/tinymce", to: "tinymce" },
         ],
       }),
+      new MiniCssExtractPlugin(),
     ],
     devServer: {
       hot: true,
       headers: {
         "Access-Control-Allow-Origin": "*",
       },
+      static: [
+        {
+          directory: path.join(__dirname, "node_modules/tinymce"),
+          publicPath: "/tinymce",
+        },
+      ],
       server: {
         type: "https",
-        options: env.WEBPACK_BUILD || options.https !== undefined ? options.https : await getHttpsOptions(),
+        options:
+          env.WEBPACK_BUILD || options.https !== undefined
+            ? options.https
+            : await getHttpsOptions(),
       },
       port: process.env.npm_package_config_dev_server_port || 3000,
     },
