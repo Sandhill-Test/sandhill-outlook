@@ -30,11 +30,29 @@ let allSubpages = [];
 /** @type {Array<Object>} Contains every page fetched from the database */
 let allPages = [];
 
+/** @type {Array<Object>} Contains every pinned subpage fetched from the database */
+let pinnedSubpages = [];
+
 /** @type {number|null} Tracks which page is currently open; null if none */
 let currentPageId = null;
 
 /** @type {number|null} Tracks which subpage is currently open; null if none */
 let currentSubpageId = null;
+
+// testing
+
+async function printPinned() {
+  try {
+    const res = await fetch(`https://localhost:3001/api/subpages/pin`);
+    if (!res.ok) throw new Error("pinned Subpage not found");
+    // return await res.json();
+    const pinnedPgs = await res.json();
+    pinnedSubpages = pinnedPgs;
+    console.log(pinnedPgs);
+  } catch (err) {
+    console.error("Failed to load subpage:", err);
+  }
+}
 
 /**
  * Collects data from the Pages and Subpage tables in the database using the Fetch API.
@@ -60,6 +78,7 @@ async function testConnection(retries = 7, delay = 2000) {
       console.log("Pages:", pages);
       console.log("Subpages:", subpages);
 
+      printPinned();
       renderResults(pages, subpages);
       return;
     } catch (err) {
