@@ -44,8 +44,12 @@ module.exports = async (env, options) => {
           use: "html-loader",
         },
         {
-          test: /\.css$/,
+          test: /skin(\.min)?\.css$/,
           use: [MiniCssExtractPlugin.loader, "css-loader"],
+        },
+        {
+          test: /content(\.min)?\.css$/i,
+          use: ["css-loader"],
         },
         {
           test: /\.(png|jpg|jpeg|gif|ico)$/,
@@ -57,6 +61,8 @@ module.exports = async (env, options) => {
       ],
     },
     plugins: [
+      new MiniCssExtractPlugin(),
+
       new HtmlWebpackPlugin({
         filename: "taskpane.html",
         template: "./src/taskpane/taskpane.html",
@@ -85,8 +91,18 @@ module.exports = async (env, options) => {
           { from: "node_modules/tinymce", to: "tinymce" },
         ],
       }),
-      new MiniCssExtractPlugin(),
     ],
+    optimization: {
+      splitChunks: {
+        chunks: "all",
+        cacheGroups: {
+          tinymceVendor: {
+            test: /[\\/]node_modules[\\/](tinymce)[\\/](.*js|.*skin.css)|[\\/]plugins[\\/]/,
+            name: "tinymce",
+          },
+        },
+      },
+    },
     devServer: {
       hot: true,
       headers: {

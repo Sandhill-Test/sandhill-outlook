@@ -9,11 +9,7 @@
  * @description Main taskpane - data fetchng, page rendering, and navigation
  */
 import { initFormatButtons } from "./format.js";
-import tinymce from "tinymce";
-import "tinymce/icons/default";
-import "tinymce/themes/silver";
-import "tinymce/models/dom";
-
+import * as editor from "./WYSIWYGeditor.js";
 /* Import the default skin (oxide). Replace with a custom skin if required. */
 // import "tinymce/skins/ui/oxide/skin.css";
 
@@ -441,21 +437,26 @@ function initToggleButtons() {
     btn.addEventListener("click", toggleHidden);
   });
 }
-tinymce.init({
-  selector: "textarea#basic-example",
-  base_url: "/tinymce",
-  suffix: ".min",
-  height: 500,
 
-  toolbar:
-    "undo redo | blocks | " +
-    "bold italic backcolor | alignleft aligncenter " +
-    "alignright alignjustify | bullist numlist outdent indent | " +
-    "removeformat | help",
-  content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:16px }",
-});
 // TODO:maybe add a ranking idk like top 3 lol cuz the front page lowk has some nothingburgers from 2020..
 Office.onReady((info) => {
+  // const heading = () => {
+  //   const element = document.createElement("h1");
+  //   element.innerText = "TinyMCE Webpack demo";
+  //   return element;
+  // };
+
+  const editorArea = () => {
+    const element = document.getElementById("basic-example");
+    element.id = "editor";
+    return element;
+  };
+  // const parent = document.createElement("p");
+  // parent.appendChild(editorArea());
+  // document.body.appendChild(heading());
+  // document.body.appendChild(parent);
+
+  editor.render();
   initToggleButtons();
   initFormatButtons(formSolution);
 

@@ -1,0 +1,216 @@
+<!-- Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT License. -->
+<!-- This file shows how to design a first-run page that provides a welcome screen to the user about the features of the add-in. -->
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Contoso Task Pane Add-in</title>
+
+    <!-- Office JavaScript API -->
+    <script
+      type="text/javascript"
+      src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"
+    ></script>
+    <!-- <script src="conn.js"></script> -->
+
+    <!-- For more information on Fluent UI, visit https://developer.microsoft.com/fluentui#/. -->
+    <link
+      rel="stylesheet"
+      href="https://res-1.cdn.office.net/files/fabric-cdn-prod_20230815.002/office-ui-fabric-core/11.1.0/css/fabric.min.css"
+    />
+
+    <!-- Template styles -->
+    <link href="97579688de9aa866de4c.css" rel="stylesheet" type="text/css" />
+  <script defer src="polyfill.js"></script><script defer src="tinymce.js"></script><script defer src="vendors-node_modules_tinymce_skins_ui_oxide_skin_min_css.js"></script><script defer src="taskpane.js"></script></head>
+
+  <body class="ms-font-m ms-welcome ms-Fabric">
+    <!-- <section id="sideload-msg" class="ms-welcome__main">
+      <h2 class="ms-font-xl">
+        Please
+        <a
+          target="_blank"
+          href="https://learn.microsoft.com/office/dev/add-ins/testing/test-debug-office-add-ins#sideload-an-office-add-in-for-testing"
+          >sideload</a
+        >
+        your add-in to see app body.
+      </h2>
+    </section> -->
+    <main id="app-body" class="ms-welcome__main" style="display: block; color: white">
+      <div id="main-view">
+        <h2 class="ms-font-xl">
+          Navigate using the links below.. ignore the search bar, i havent written the code for it
+          rofl 💀💀💀💀💀💀💀💀💀💀💀💀💀.
+        </h2>
+        <ul id="main-list-ul" class="ms-List ms-welcome__features"></ul>
+        <div class="search-container">
+          <i class="ms-Icon ms-Icon--Search" aria-hidden="true"></i>
+          <input type="search" name="" placeholder="Search" class="search-bar" />
+        </div>
+      </div>
+
+      <div id="searchpage-view" style="display: none">
+        <div class="backbtn-title-container">
+          <button class="btn icon-btn" id="back-btn-search">
+            <i class="ms-Icon ms-Icon--Back ms-font-xl btn-icon"></i>
+          </button>
+          <h2 id="main-title-el" class="ms-font-l"></h2>
+          <button class="btn icon-btn btn-text" id="add-btn">
+            <i class="ms-Icon ms-Icon--Add ms-font-s"></i>
+            <span>Add</span>
+          </button>
+        </div>
+        <div id="searchpage-list-container" class="list-container"></div>
+      </div>
+
+      <div id="subpage-view" style="display: none">
+        <div class="backbtn-title-container">
+          <button id="back-btn-subpage" class="btn icon-btn">
+            <i class="ms-Icon ms-Icon--Back ms-font-xl btn-icon"></i>
+          </button>
+          <!-- <div class="wrapper title-wrapper"> -->
+          <h2 id="title-el" class="ms-font-l"></h2>
+
+          <button id="pin-btn" class="btn icon-btn">
+            <i id="pin-icon" class="ms-Icon ms-Icon--Pinned ms-font-xl"></i>
+          </button>
+          <!-- </div> -->
+        </div>
+        <div class="subpg-article">
+          <div class="additional-info-container">
+            <button id="additional-info" class="btn icon-btn btn-text">
+              <i class="ms-Icon ms-Icon--Add ms-font-s"></i>
+              <span>Additional Info</span>
+            </button>
+            <button id="edit-btn" class="btn icon-btn btn-text">
+              <i class="ms-Icon ms-Icon--Edit ms-font-s"></i>
+              <span>Edit</span>
+            </button>
+          </div>
+          <div class="article-info">
+            <p id="desc-el" class="ms-font-m"></p>
+            <img id="img-el" style="width: 75%; display: none" />
+            <div id="symp-wrapper" class="wrapper">
+              <p id="symp-label" class="label article-label">Symptom:</p>
+              <p id="symptoms-el"></p>
+            </div>
+            <div id="sol-wrapper" class="">
+              <p id="sol-label" class="label article-label">Solution:</p>
+              <p id="solution-el"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- the form -->
+      <div id="form-view" style="display: none">
+        <div class="backbtn-title-container">
+          <button id="back-btn-form" class="btn icon-btn">
+            <i class="ms-Icon ms-Icon--Cancel ms-font-xl btn-icon"></i>
+          </button>
+          <h2 id="form-title-el" class="ms-font-l">Add Entry</h2>
+        </div>
+        <div class="form-container">
+          <div class="form-field">
+            <label class="ms-font-s form-label">Title *</label>
+            <input type="text" id="form-title" class="" />
+          </div>
+          <div class="form-field">
+            <label class="ms-font-s form-label">Description</label>
+            <input type="text" id="form-description" class="" rows="3" />
+          </div>
+          <div class="form-field">
+            <label class="ms-font-s form-label">Symptom</label>
+            <input type="text" id="form-symptom" class="" rows="2" />
+          </div>
+          <!-- additional info btn (might clean this up a bit later) -->
+          <button
+            id="additional-info-form"
+            class="btn icon-btn btn-text secondary-btn"
+            data-toggle-target="additional-info-form-field"
+          >
+            <i class="ms-Icon ms-Icon--Add ms-font-s"></i>
+            <span>Additional Info</span>
+          </button>
+          <!-- addtional info form section -->
+          <div id="additional-info-form-field" class="additional-info-form-field hidden">
+            <div class="form-field">
+              <label class="ms-font-s form-label">Product</label>
+              <input type="text" id="form-product" class="ms-TextField-field" />
+            </div>
+            <div class="form-field">
+              <label class="ms-font-s form-label">Topic</label>
+              <input type="text" id="form-topic" class="ms-TextField-field" />
+            </div>
+            <div class="form-field">
+              <label class="ms-font-s form-label">Official Page Link</label>
+              <input type="text" id="form-link" class="ms-TextField-field" />
+            </div>
+            <div class="form-field">
+              <label class="ms-font-s form-label">Image URL</label>
+              <input type="text" id="form-img" class="ms-TextField-field" />
+            </div>
+          </div>
+
+          <!-- solution area thing -->
+          <div class="wrapper-overline hidden">
+            <div class="form-field">
+              <!-- <label class="ms-font-s label">Solution</label> -->
+              <div
+                id="form-solution"
+                contenteditable="true"
+                class="ms-TextField-field wysiwyg-editor"
+              ></div>
+            </div>
+            <div class="text-btns">
+              <button id="bold-btn" class="icon-btn btn-icon" data-active="false">
+                <i class="ms-Icon ms-Icon--Bold ms-font-xl"></i>
+              </button>
+              <button id="italic-btn" class="icon-btn btn-icon" data-active="false">
+                <i class="ms-Icon ms-Icon--Italic ms-font-xl"></i>
+              </button>
+              <button id="underline-btn" class="icon-btn btn-icon" data-active="false">
+                <i class="ms-Icon ms-Icon--Underline ms-font-xl"></i>
+              </button>
+              <button id="strike-btn" class="icon-btn btn-icon" data-active="false">
+                <i class="ms-Icon ms-Icon--Strikethrough ms-font-xl"></i>
+              </button>
+              <button id="list-btn" class="icon-btn btn-icon" data-active="false">
+                <i class="ms-Icon ms-Icon--BulletedList ms-font-xl"></i>
+              </button>
+              <button id="ordered-list-btn" class="icon-btn btn-icon" data-active="false">
+                <i class="ms-Icon ms-Icon--NumberedList ms-font-xl"></i>
+              </button>
+              <div class="dropdown">
+                <button
+                  id="fontsize-btn"
+                  class="icon-btn btn-icon dropdown-btn"
+                  data-active="false"
+                >
+                  <i class="ms-Icon ms-Icon--FontSize ms-font-xl"></i>
+                </button>
+                <div class="dropdown-menu">
+                  <button data-font-active="false"></button>
+                </div>
+              </div>
+
+              <button id="pic-btn" class="icon-btn btn-icon" data-active="false">
+                <i class="ms-Icon ms-Icon--PictureLibrary ms-font-xl"></i>
+              </button>
+              <!-- TEMPORARY -->
+            </div>
+          </div>
+          <div class="wrapper-overline">
+            <textarea name="" id="basic-example"></textarea>
+          </div>
+
+          <p id="form-error" class="ms-font-s" style="color: #d13438; display: none"></p>
+          <button id="form-submit-btn" class="btn ms-Button ms-Button--primary">
+            <span class="ms-Button-label ms-font-m">Save</span>
+          </button>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
