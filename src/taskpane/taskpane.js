@@ -370,7 +370,8 @@ async function submitForm(mode, subpageId) {
     symptom: document.getElementById("form-symptom").value.trim() || null,
 
     // FIXME:yeah look into this one rq
-    solution: formSolution.innerHTML.trim() || null,
+    // solution: formSolution.innerHTML.trim() || null,
+    solution: editor.getEditorContent().trim() || null,
     product: document.getElementById("form-product").value.trim() || null,
     topic: document.getElementById("form-topic").value.trim() || null,
     officialpg_link: document.getElementById("form-link").value.trim() || null,
