@@ -10,16 +10,6 @@
  */
 import { initFormatButtons } from "./format.js";
 import * as editor from "./WYSIWYGeditor.js";
-/* Import the default skin (oxide). Replace with a custom skin if required. */
-// import "tinymce/skins/ui/oxide/skin.css";
-
-// WARNING!!!!  WARNING!!!! WARNING!!!! WARNING!!!! WARNING!!!! WARNING!!!! WARNING!!!! WARNING!!!! WARNING!!!!
-
-// I HAVE USED execCommand() FOR THE TEXT EDITOR. HTML5 HAS RENDERED THIS METHOD AS OBSOLETE AND MULTIPLE BROWSERS ARE MOVING AWAY FROM THIS.
-// HOWEVER OUTLOOK ADD IN USES CHROMIUM BROWSER BY DEFAULT AND THE METHOD HAS NOT DEPRECATED COMPLETELY
-// SINCE HTML5 ARE LIARS AND CANNOT MAKE UP THEIR MIND, THERE'S NO CURRENT ALTERNATIVE TO THIS DAY (MAY 2026). A DECADE HAS PASSED AND DEVS RELY ON REACT JS OR NODE PACKAGES TO CREATE THIS.
-// ***HOWEVER*** IM USING VANILLA JS - NO PACKAGES - SO MY ONLY CHOICE IS CAPTURING EVERY SINGLE KEYUP/DOWN EVENT OR USE THE CONTENTEDITABLE ATTRIBUTE. I DO NOT WANT TO DO THE FORMER, SO I'M STICKING WITH THE CONTENTEDITABLE + execCommand() COMBO.
-// IF THE TEXT AREA STOPS REGISTERING BOLD FONT, UNDERLINES ETC. THIS MEANS THAT MY applyFormat() FUCNTION IS OBSOLETE AND YOU WILL NEED TO USE REACT JS TO GET A WORKING WYSIWYG TEXT EDITOR. ALSO REMEMBER TO HOOK THIS UP WITH THE CONN.JS FILE SO CHANEGS CAN BE APPENDED TO THE DATABASE.
 
 // WARNING!!!!  WARNING!!!! WARNING!!!! WARNING!!!! WARNING!!!! WARNING!!!! WARNING!!!! WARNING!!!! WARNING!!!!
 
@@ -336,7 +326,10 @@ function showFormView(mode, subpage = null) {
   document.getElementById("form-description").value = subpage?.description ?? "";
   document.getElementById("form-symptom").value = subpage?.symptom ?? "";
 
+  const solutionData = subpage?.solution ?? "";
+  editor.setEditorContent(solutionData);
   formSolution.innerHTML = subpage?.solution ?? "";
+
   document.getElementById("form-product").value = subpage?.product ?? "";
   document.getElementById("form-topic").value = subpage?.topic ?? "";
   document.getElementById("form-link").value = subpage?.officialpg_link ?? "";

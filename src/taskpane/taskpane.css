@@ -4,6 +4,7 @@
  */
 
 :root {
+  --mainbg: #262626;
   --neutralDark: #212121;
   --neutralPrimary: #333333;
   --neutralPrimaryAlt: #3c3c3c;
@@ -400,4 +401,42 @@ textarea:hover {
 
 .ms-Icon--Pinned:hover {
   color: #0078d4;
+}
+
+/* TinyMCE toolbar overrides */
+.tox .tox-editor-header,
+.tox .tox-editor-container,
+.tox .tox-menubar,
+.tox .tox-toolbar,
+.tox .tox-menu,
+.tox .tox-toolbar__primary,
+.tox .tox-toolbar__overflow,
+.tox .tox-toolbar-overlord,
+.tox .tox-statusbar,
+.tox-editor-header button {
+  background-color: var(--mainbg) !important;
+  border-color: var(--neutralSecondary) !important;
+}
+
+/* hovering btns underline */
+.tox .tox-mbtn {
+  border-radius: 0;
+}
+.tox .tox-mbtn:focus {
+  outline: none;
+}
+.tox .tox-mbtn :hover {
+  border-bottom: 2px solid var(--neutralTertiary);
+}
+
+.tox .tox-mbtn--active :hover {
+  border-bottom: 2px solid var(--linkHover);
+}
+.tox .tox-tbtn--enabled {
+  border: 1px solid var(--neutralTertiary) !important;
+  background-color: var(--itemHover) !important;
+}
+.tox .tox-tbtn:hover {
+  /* border: 1px solid var(--neutralTertiary); */
+  background-color: var(--itemHover) !important;
 }
