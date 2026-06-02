@@ -440,3 +440,8 @@ textarea:hover {
   /* border: 1px solid var(--neutralTertiary); */
   background-color: var(--itemHover) !important;
 }
+
+.justify-end-wrapper {
+  display: flex;
+  justify-content: space-between;
+}

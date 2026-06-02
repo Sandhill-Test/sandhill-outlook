@@ -39,13 +39,26 @@
       </h2>
     </section> -->
     <main id="app-body" class="ms-welcome__main" style="display: block; color: white">
+      <div class="search-container">
+        <i class="ms-Icon ms-Icon--Search" aria-hidden="true"></i>
+        <input id="search-bar" type="search" name="" placeholder="Search" class="search-bar" />
+      </div>
+      <div id="search-view" class="">
+        <ul id="search-results"></ul>
+        <div class="wrapper">
+          <i class="ms-Icon ms-Icon--SearchIssue ms-font-xl" aria-hidden="true"></i>
+          <div class="">
+            <p>title</p>
+            <div class="justify-end-wrapper">
+              <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum, incidunt!</p>
+              <p>Troubleshooting</p>
+            </div>
+          </div>
+        </div>
+      </div>
       <div id="main-view">
         <h2 class="ms-font-xl">Navigate using the links below.</h2>
         <ul id="main-list-ul" class="ms-List ms-welcome__features"></ul>
-        <div class="search-container">
-          <i class="ms-Icon ms-Icon--Search" aria-hidden="true"></i>
-          <input type="search" name="" placeholder="Search" class="search-bar" />
-        </div>
       </div>
 
       <div id="searchpage-view" style="display: none">

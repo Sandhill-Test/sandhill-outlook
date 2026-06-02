@@ -70,9 +70,10 @@ async function testConnection(retries = 7, delay = 2000) {
       // checking if the data has been correctly appended to the arrays
       console.log("Pages:", pages);
       console.log("Subpages:", subpages);
-
+      // TODO: UPDATE THIS PINNED LOGIC
       printPinned();
       renderResults(pages, subpages);
+      renderSearchBarList(subpages);
       return;
     } catch (err) {
       console.warn(
@@ -147,8 +148,30 @@ async function subpageFetchUtil(id) {
     console.error("Failed to load subpage:", err);
   }
 }
-// FIXME: lol the search bar dont work for now.... probs will remove it later
+// FIXME: fuzzy matching, showing main pg if input == null or ""
+async function renderSearchBarList(subpages) {
+  try {
+    const filterSubpages = (startLetters, subpages) =>
+      subpages.filter((subpage) => subpage.title.match(new RegExp(startLetters, "i")));
+    const subpageList = document.getElementById("search-results");
+    // subpageList.innerHTML = subpages.map((subpage) => `<li>${subpage.title}</li>`).join("");
+    subpageList.innerHTML = "";
 
+    document.getElementById("search-bar").addEventListener("input", function (event) {
+      const startLetters = event.target.value;
+      if (startLetters != "" || null) {
+        showView("search-view");
+      } else {
+        showView("main-view");
+      }
+      const filteredSubpages = filterSubpages(startLetters, subpages);
+      console.log(filteredSubpages);
+      subpageList.innerHTML = filteredSubpages
+        .map((subpage) => `<li>${subpage.title}</li>`)
+        .join("");
+    });
+  } catch (error) {}
+}
 /**
  * Renders the list view for a given page, displaying all of its subpages.
  * Updates {@link currentPageId} and switches to the `searchpage-view`.
@@ -161,6 +184,7 @@ async function renderSearchList(id) {
     currentPageId = id;
     const subpages = allSubpages.filter((sp) => sp.parentpg == id);
     console.log(subpages);
+
     const page = allPages.find((p) => p.Id == id);
     document.getElementById("main-title-el").innerText = page?.name ?? "";
     showView("searchpage-view");
@@ -172,6 +196,7 @@ async function renderSearchList(id) {
       const subPgUl = `<ul class="sub-listitem">${subPgList}</ul>`;
       listContainer.insertAdjacentHTML("beforeend", subPgUl);
     });
+    // TODO: UPDATE THIS
   } catch (err) {}
 }
 
@@ -297,7 +322,7 @@ function backButton() {
  * @returns {void}
  */
 function showView(viewId) {
-  ["main-view", "searchpage-view", "subpage-view", "form-view"].forEach((id) => {
+  ["main-view", "searchpage-view", "subpage-view", "form-view", "search-view"].forEach((id) => {
     document.getElementById(id).style.display = id === viewId ? "block" : "none";
   });
 }
