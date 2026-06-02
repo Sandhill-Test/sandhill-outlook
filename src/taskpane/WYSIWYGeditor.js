@@ -18,6 +18,7 @@ import "tinymce/plugins/code";
 // import "tinymce/plugins/emoticons/js/emojis";
 import "tinymce/plugins/link";
 import "tinymce/plugins/image";
+import "tinymce/plugins/save";
 import "tinymce/plugins/quickbars";
 import "tinymce/plugins/lists";
 import "tinymce/plugins/table";
@@ -60,12 +61,13 @@ export function render() {
     license_key: "gpl",
     selector: "div#basic-example",
     inline: true,
-    menubar: false,
-    plugins: "advlist code link image lists table",
+    menubar: true,
+    plugins: "advlist code link image lists table save",
     toolbar: [
-      "undo redo | bold italic underline | fontfamily fontsize",
+      "undo redo save | bold italic underline | fontfamily fontsize",
       "forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent | image",
     ],
+
     image_title: true,
     automatic_uploads: true,
     file_picker_types: "image",
@@ -99,6 +101,15 @@ export function render() {
       });
 
       input.click();
+    },
+    paste_postprocess: (plugin, args) => {
+      // Remove Word's inline bullet character spans
+      args.node.querySelectorAll("span[style*='mso-list']").forEach((el) => el.remove());
+      // Strip Word-specific styles and classes from list elements
+      args.node.querySelectorAll("ul, ol, li").forEach((el) => {
+        el.removeAttribute("style");
+        el.removeAttribute("class");
+      });
     },
     base_url: "/tinymce",
     suffix: ".min",
