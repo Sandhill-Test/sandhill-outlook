@@ -63,6 +63,7 @@ async function testConnection(retries = 7, delay = 2000) {
       const [pagesRes, subpagesRes, topicsRes] = await Promise.all([
         fetch("https://localhost:3001/api/pages"),
         fetch("https://localhost:3001/api/subpages"),
+        fetch("https://localhost:3001/api/topics"),
       ]);
       const pages = await pagesRes.json();
       const subpages = await subpagesRes.json();
@@ -77,6 +78,7 @@ async function testConnection(retries = 7, delay = 2000) {
       console.log("Topics:", topics);
       // TODO: UPDATE THIS PINNED LOGIC
       printPinned();
+      getTopicOptions(topics);
       renderResults(pages, subpages);
       renderSearchBarList(subpages);
       return;
@@ -254,13 +256,13 @@ async function renderSubpage(id) {
       // solWrapper.classList.remove("wrapper");
     }
 
-    const imgEl = document.getElementById("img-el");
-    if (subpage.img) {
-      imgEl.src = subpage.img;
-      imgEl.style.display = "block";
-    } else {
-      imgEl.style.display = "none";
-    }
+    // const imgEl = document.getElementById("img-el");
+    // if (subpage.img) {
+    //   imgEl.src = subpage.img;
+    //   imgEl.style.display = "block";
+    // } else {
+    //   imgEl.style.display = "none";
+    // }
 
     // TODO: Update dates
     // additional fields - supposed to open up another panel or smth. TODO: might do smth similar for the edit functions idk yet
@@ -377,7 +379,6 @@ function showFormView(mode, subpage = null) {
 
   document.getElementById("form-topic").value = subpage?.topic ?? "";
   document.getElementById("form-link").value = subpage?.officialpg_link ?? "";
-  document.getElementById("form-img").value = subpage?.img ?? "";
   document.getElementById("form-error").style.display = "none";
 
   document.getElementById("form-submit-btn").onclick = () => submitForm(mode, subpage?.Id ?? null);
@@ -388,7 +389,12 @@ function showFormView(mode, subpage = null) {
 
   showView("form-view");
 }
-
+function getTopicOptions(topics) {
+  const topicSelector = document.getElementById("form-topic");
+  topicSelector.innerHTML = topics
+    .map((tp) => `<option value="${tp.Id != null ? tp.Id : ""}">${tp.name}</option>`)
+    .join("");
+}
 /**
  * Validates and submits the form data to the API.
  * Sends a POST request in "add" mode or a PUT request in "edit" mode.
@@ -416,12 +422,11 @@ async function submitForm(mode, subpageId) {
     // FIXME:yeah look into this one rq
     // solution: formSolution.innerHTML.trim() || null,
 
-    // TODO: const formTopic = subpages.filter((sp) => sp.topic == topics.Id);
     solution: editor.getEditorContent().trim() || null,
     product: document.getElementById("form-product").value.trim() || null,
     topic: document.getElementById("form-topic").value.trim() || null,
     officialpg_link: document.getElementById("form-link").value.trim() || null,
-    img: document.getElementById("form-img").value.trim() || null,
+    // TODO: REMOVE FORM IMG
   };
 
   // TODO: add an alert? yes or no?
