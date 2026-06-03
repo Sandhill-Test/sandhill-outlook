@@ -175,8 +175,10 @@ async function renderSearchBarList(subpages) {
       console.log(filteredSubpages);
       subpageList.innerHTML = filteredSubpages
         .map(
-          (subpage) => `<li class="search-list"><a src="#" class="wrapper list-link">
-          <i class="ms-Icon ms-Icon--SearchIssue ms-font-xl" aria-hidden="true"></i>
+          (
+            subpage
+          ) => `<li class="search-list"><a href="${subpage.Id != null ? "#subpage-" + subpage.Id : ""}" class="wrapper list-link">
+          <i class="ms-Icon ms-Icon--${subpage.topic == "Troubleshooting" ? "SearchIssue" : subpage.topic == "Guides" ? "Help" : subpage.topic == "Informational" ? "Info" : subpage.topic == "Resources" ? "Download" : ""} ms-font-xl" aria-hidden="true"></i>
           <div class="search-result-text">
             <p>${subpage.title}</p>
             <div class="justify-end-wrapper">

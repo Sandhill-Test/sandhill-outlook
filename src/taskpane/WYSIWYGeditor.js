@@ -57,17 +57,9 @@ import "tinymce/plugins/help/js/i18n/keynav/en";
 //   });
 // }
 export function render() {
-  tinymce.init({
+  const editorUtil = {
     license_key: "gpl",
-    selector: "div#basic-example",
     inline: true,
-    menubar: true,
-    plugins: "advlist code link image lists table save",
-    toolbar: [
-      "undo redo save | bold italic underline | fontfamily fontsize",
-      "forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent | image",
-    ],
-
     image_title: true,
     automatic_uploads: true,
     file_picker_types: "image",
@@ -102,15 +94,6 @@ export function render() {
 
       input.click();
     },
-    paste_postprocess: (plugin, args) => {
-      // Remove Word's inline bullet character spans
-      args.node.querySelectorAll("span[style*='mso-list']").forEach((el) => el.remove());
-      // Strip Word-specific styles and classes from list elements
-      args.node.querySelectorAll("ul, ol, li").forEach((el) => {
-        el.removeAttribute("style");
-        el.removeAttribute("class");
-      });
-    },
     base_url: "/tinymce",
     suffix: ".min",
     promotion: false,
@@ -131,7 +114,39 @@ export function render() {
       hr { border-color: #6d737b; border-width: 1px 0 0 0; }
       code { background-color: #6d737b; border-radius: 3px; padding: 0.1rem 0.2rem; }
     `,
-  });
+  };
+  const solutionOpt = {
+    selector: "div#basic-example",
+    menubar: true,
+    plugins: "advlist code link image lists table save",
+    toolbar: [
+      "undo redo save | bold italic underline | fontfamily fontsize",
+      "forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent | image",
+    ],
+
+    paste_postprocess: (plugin, args) => {
+      // Remove Word's inline bullet character spans
+      args.node.querySelectorAll("span[style*='mso-list']").forEach((el) => el.remove());
+      // Strip Word-specific styles and classes from list elements
+      args.node.querySelectorAll("ul, ol, li").forEach((el) => {
+        el.removeAttribute("style");
+        el.removeAttribute("class");
+      });
+    },
+  };
+
+  const descOpt = {
+    selector: "div#form-description",
+    menubar: false,
+    plugins: "image",
+    toolbar: ["bold italic underline image"],
+  };
+
+  const solutionEditor = { ...editorUtil, ...solutionOpt };
+  const descriptionEditor = { ...editorUtil, ...descOpt };
+  // solution editor
+  tinymce.init(solutionEditor);
+  tinymce.init(descriptionEditor);
 }
 export function getEditorContent() {
   try {
@@ -146,6 +161,7 @@ export function getEditorContent() {
   }
 }
 
+// FIXME: IMPORTANT ASAP
 export function setEditorContent(text) {
   const editor = tinymce.activeEditor;
   const html = editor.setContent(text);
