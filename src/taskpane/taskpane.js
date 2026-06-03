@@ -23,6 +23,8 @@ let allSubpages = [];
 /** @type {Array<Object>} Contains every page fetched from the database */
 let allPages = [];
 
+let allTopics = [];
+
 /** @type {Array<Object>} Contains every pinned subpage fetched from the database */
 let pinnedSubpages = [];
 
@@ -58,18 +60,21 @@ async function printPinned() {
 async function testConnection(retries = 7, delay = 2000) {
   for (let i = 0; i < retries; i++) {
     try {
-      const [pagesRes, subpagesRes] = await Promise.all([
+      const [pagesRes, subpagesRes, topicsRes] = await Promise.all([
         fetch("https://localhost:3001/api/pages"),
         fetch("https://localhost:3001/api/subpages"),
       ]);
       const pages = await pagesRes.json();
       const subpages = await subpagesRes.json();
+      const topics = await topicsRes.json();
       allSubpages = subpages;
       allPages = pages;
+      allTopics = topics;
 
       // checking if the data has been correctly appended to the arrays
       console.log("Pages:", pages);
       console.log("Subpages:", subpages);
+      console.log("Topics:", topics);
       // TODO: UPDATE THIS PINNED LOGIC
       printPinned();
       renderResults(pages, subpages);
@@ -369,6 +374,7 @@ function showFormView(mode, subpage = null) {
   document.getElementById("form-product").value = subpage?.product ?? "";
 
   // TODO: MAKE THIS THE DEFAULT VALUE OF THE DROPDOWN
+
   document.getElementById("form-topic").value = subpage?.topic ?? "";
   document.getElementById("form-link").value = subpage?.officialpg_link ?? "";
   document.getElementById("form-img").value = subpage?.img ?? "";
