@@ -38,23 +38,23 @@
         your add-in to see app body.
       </h2>
     </section> -->
-    <main id="app-body" class="ms-welcome__main" style="display: block; color: white">
+    <main id="app-body" class="ms-welcome__main darkmode" style="display: block; color: white">
       <div class="search-container">
         <i class="ms-Icon ms-Icon--Search" aria-hidden="true"></i>
         <input id="search-bar" type="search" name="" placeholder="Search" class="search-bar" />
       </div>
       <div id="search-view" class="">
         <ul id="search-results"></ul>
-        <div class="wrapper">
+        <!-- <div class="wrapper">
           <i class="ms-Icon ms-Icon--SearchIssue ms-font-xl" aria-hidden="true"></i>
-          <div class="">
+          <div class="search-result-text">
             <p>title</p>
             <div class="justify-end-wrapper">
-              <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum, incidunt!</p>
-              <p>Troubleshooting</p>
+              <p class="result-desc">Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum, incidunt!</p>
+              <p class="result-tag">Troubleshooting</p>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
       <div id="main-view">
         <h2 class="ms-font-xl">Navigate using the links below.</h2>
@@ -151,7 +151,10 @@
             </div>
             <div class="form-field">
               <label class="ms-font-s form-label">Topic</label>
-              <input type="text" id="form-topic" class="ms-TextField-field" />
+              <!-- <input type="text" id="form-topic" class="ms-TextField-field" /> -->
+               <select name="topics" id="form-topic">
+                <option value=""></option>
+               </select>
             </div>
             <div class="form-field">
               <label class="ms-font-s form-label">Official Page Link</label>

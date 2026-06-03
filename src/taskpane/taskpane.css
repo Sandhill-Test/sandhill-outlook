@@ -29,13 +29,16 @@ body {
   color: white;
 }
 /* fix this */
-/* ul {
+ul {
   margin: 0;
   padding: 0;
-} */
+}
 a {
   color: inherit;
   text-decoration: none;
+}
+.darkmode {
+  background-color: var(--mainbg);
 }
 
 ms-ListItem > a:hover {
@@ -154,9 +157,11 @@ b {
   border-radius: 0px;
   width: 90%;
 }
-.ms-Icon--Search {
+.ms-Icon--Search,
+.ms-Icon--SearchIssue {
   align-self: center;
-  padding-right: 20px;
+  padding-right: 12px;
+  flex-shrink: 0;
 }
 .search-bar {
   all: unset;
@@ -334,7 +339,7 @@ textarea:hover {
   border-top: 1px solid var(--neutralSecondary);
 }
 
-.dropdown {
+/* .dropdown {
   position: relative;
   display: inline-block;
 }
@@ -343,6 +348,7 @@ textarea:hover {
 .dropdown-btn {
   transition: background 0.2s ease;
 }
+*/
 
 /* .dropdown-btn:hover {
   background: #1e4fd8;
@@ -361,7 +367,7 @@ textarea:hover {
   transform: rotate(225deg);
 } */
 
-.dropdown-menu {
+/* .dropdown-menu {
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
@@ -384,7 +390,7 @@ textarea:hover {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
-}
+} */
 
 /* .dropdown-menu a {
   display: block;
@@ -441,7 +447,47 @@ textarea:hover {
   background-color: var(--itemHover) !important;
 }
 
+.search-result-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.search-result-text p {
+  margin: 0;
+}
+
 .justify-end-wrapper {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.result-desc {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: small;
+  color: var(--neutralTertiary);
+  flex: 1;
+  min-width: 0;
+  width: 50%;
+}
+
+.result-tag {
+  flex-shrink: 0;
+  font-size: small;
+  color: var(--neutralTertiary);
+}
+
+.search-list {
+  list-style-type: none;
+  margin-bottom: 20px;
+}
+.list-link:hover {
+  background-color: var(--itemHover);
+}
+.list-link {
+  color: white;
+  cursor: pointer;
 }

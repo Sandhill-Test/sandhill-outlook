@@ -167,7 +167,18 @@ async function renderSearchBarList(subpages) {
       const filteredSubpages = filterSubpages(startLetters, subpages);
       console.log(filteredSubpages);
       subpageList.innerHTML = filteredSubpages
-        .map((subpage) => `<li>${subpage.title}</li>`)
+        .map(
+          (subpage) => `<li class="search-list"><a src="#" class="wrapper list-link">
+          <i class="ms-Icon ms-Icon--SearchIssue ms-font-xl" aria-hidden="true"></i>
+          <div class="search-result-text">
+            <p>${subpage.title}</p>
+            <div class="justify-end-wrapper">
+              <p class="result-desc">${subpage.description}</p>
+              <p class="result-tag">${subpage.topic}</p>
+            </div>
+          </div>
+        </a></li>`
+        )
         .join("");
     });
   } catch (error) {}
@@ -356,6 +367,8 @@ function showFormView(mode, subpage = null) {
   formSolution.innerHTML = subpage?.solution ?? "";
 
   document.getElementById("form-product").value = subpage?.product ?? "";
+
+  // TODO: MAKE THIS THE DEFAULT VALUE OF THE DROPDOWN
   document.getElementById("form-topic").value = subpage?.topic ?? "";
   document.getElementById("form-link").value = subpage?.officialpg_link ?? "";
   document.getElementById("form-img").value = subpage?.img ?? "";
@@ -396,6 +409,8 @@ async function submitForm(mode, subpageId) {
 
     // FIXME:yeah look into this one rq
     // solution: formSolution.innerHTML.trim() || null,
+
+    // TODO: const formTopic = subpages.filter((sp) => sp.topic == topics.Id);
     solution: editor.getEditorContent().trim() || null,
     product: document.getElementById("form-product").value.trim() || null,
     topic: document.getElementById("form-topic").value.trim() || null,
