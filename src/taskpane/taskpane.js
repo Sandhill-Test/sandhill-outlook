@@ -155,12 +155,12 @@ async function subpageFetchUtil(id) {
   }
 }
 // FIXME: fuzzy matching, showing main pg if input == null or ""
+// TODO: ADD SMTH WHERE THE USER CAN ADD AN ARTICLE IF THERE'S NO RESULTS
 async function renderSearchBarList(subpages) {
   try {
     const filterSubpages = (startLetters, subpages) =>
       subpages.filter((subpage) => subpage.title.match(new RegExp(startLetters, "i")));
     const subpageList = document.getElementById("search-results");
-    // subpageList.innerHTML = subpages.map((subpage) => `<li>${subpage.title}</li>`).join("");
     subpageList.innerHTML = "";
 
     document.getElementById("search-bar").addEventListener("input", function (event) {
@@ -181,8 +181,8 @@ async function renderSearchBarList(subpages) {
           <div class="search-result-text">
             <p>${subpage.title}</p>
             <div class="justify-end-wrapper">
-              <p class="result-desc">${subpage.description}</p>
-              <p class="result-tag">${subpage.topic}</p>
+              <p class="result-desc">${allPages.find((p) => p.Id == subpage.parentpg)?.name ?? ""}</p>
+              <p class="result-tag">${subpage.topic != null ? subpage.topic : ""}</p>
             </div>
           </div>
         </a></li>`
@@ -216,8 +216,8 @@ async function renderSearchList(id) {
           <div class="search-result-text">
             <p>${subpage.title}</p>
             <div class="justify-end-wrapper">
-              <p class="result-desc">${subpage.description}</p>
-              <p class="result-tag">${subpage.topic}</p>
+              <p class="result-desc">${subpage.description != null ? subpage.description : ""}</p>
+              <p class="result-tag">${subpage.topic != null ? subpage.topic : ""}</p>
             </div>
           </div>
         </a></li>`;
