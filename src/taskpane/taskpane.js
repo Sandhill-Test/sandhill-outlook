@@ -368,11 +368,14 @@ const formSolution = document.getElementById("form-solution");
 function showFormView(mode, subpage = null) {
   document.getElementById("form-title-el").innerText = mode === "edit" ? "Edit Entry" : "Add Entry";
   document.getElementById("form-title").value = subpage?.title ?? "";
-  document.getElementById("form-description").value = subpage?.description ?? "";
-  document.getElementById("form-symptom").value = subpage?.symptom ?? "";
+  const descriptionData = subpage?.description ?? "";
+  editor.setEditorContent("form-description", descriptionData);
+
+  const symptomData = subpage?.symptom ?? "";
+  editor.setEditorContent("form-symptom", symptomData);
 
   const solutionData = subpage?.solution ?? "";
-  editor.setEditorContent(solutionData);
+  editor.setEditorContent("basic-example", solutionData);
   formSolution.innerHTML = subpage?.solution ?? "";
 
   document.getElementById("form-product").value = subpage?.product ?? "";
@@ -418,13 +421,11 @@ async function submitForm(mode, subpageId) {
 
   const body = {
     title,
-    description: document.getElementById("form-description").value.trim() || null,
-    symptom: document.getElementById("form-symptom").value.trim() || null,
+    // description: document.getElementById("form-description").value.trim() || null,
+    description: editor.getEditorContent("form-description").trim() || null,
+    symptom: editor.getEditorContent("form-symptom").value.trim() || null,
 
-    // FIXME:yeah look into this one rq
-    // solution: formSolution.innerHTML.trim() || null,
-
-    solution: editor.getEditorContent().trim() || null,
+    solution: editor.getEditorContent("basic-example").trim() || null,
     product: document.getElementById("form-product").value.trim() || null,
     topic: document.getElementById("form-topic").value.trim() || null,
     officialpg_link: document.getElementById("form-link").value.trim() || null,

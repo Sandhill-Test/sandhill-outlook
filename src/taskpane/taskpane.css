@@ -290,6 +290,11 @@ b {
   margin-top: 10px;
   align-items: center;
 }
+.tinymce-form-field {
+  display: flex;
+  margin-top: 10px;
+  align-items: center;
+}
 .form-label {
   background-color: var(--neutralPrimaryAlt);
   border: 1px solid var(--neutralSecondary);
@@ -490,4 +495,11 @@ textarea:hover {
 .list-link {
   color: white;
   cursor: pointer;
+}
+.mce-form-body {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--neutralSecondary);
+  outline: 0;
+  /* background: transparent; */
 }

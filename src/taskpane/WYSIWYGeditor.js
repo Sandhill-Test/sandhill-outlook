@@ -141,31 +141,35 @@ export function render() {
     plugins: "image",
     toolbar: ["bold italic underline image"],
   };
+  const sympOpt = {
+    selector: "div#form-symptom",
+    menubar: false,
+    plugins: "image",
+    toolbar: ["bold italic underline image"],
+  };
 
   const solutionEditor = { ...editorUtil, ...solutionOpt };
   const descriptionEditor = { ...editorUtil, ...descOpt };
+  const symptomEditor = { ...editorUtil, ...sympOpt };
   // solution editor
   tinymce.init(solutionEditor);
   tinymce.init(descriptionEditor);
+  tinymce.init(symptomEditor);
 }
-export function getEditorContent() {
+export function getEditorContent(editorId) {
   try {
-    // const content = tinymce.get("basic-example").getContent;
-    const content = tinymce.activeEditor;
-    const htmlContent = content.getContent();
-    console.log(htmlContent);
-
-    return htmlContent;
+    const content = tinymce.get(editorId);
+    return content.getContent();
   } catch (err) {
     console.error("error retrieving content", err);
+    return "";
   }
 }
 
-// FIXME: IMPORTANT ASAP
-export function setEditorContent(text) {
-  const editor = tinymce.activeEditor;
-  const html = editor.setContent(text);
+export function setEditorContent(editorId, text) {
   try {
+    const ed = tinymce.get(editorId);
+    ed.setContent(text);
   } catch (err) {
     console.error("error setting content", err);
   }
