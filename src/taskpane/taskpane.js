@@ -208,25 +208,74 @@ async function renderSearchList(id) {
     document.getElementById("main-title-el").innerText = page?.name ?? "";
     showView("searchpage-view");
 
-    const listContainer = document.getElementById("searchpage-list-container");
-    listContainer.innerHTML = "";
-    subpages.forEach((subpage) => {
-      const subPgList = `<li class="search-list"><a href="${subpage.Id != null ? "#subpage-" + subpage.Id : ""}" class="wrapper list-link">
+    const ulItem = document.getElementById("ul-list-item");
+    ulItem.innerHTML = "";
+    const selectBtn = document.getElementById("select-btn");
+    let selectBtnStatus = selectBtn.dataset.selectionmode;
+    // console.log(selectBtnStatus);
+    const addBtn = document.getElementById("add-btn");
+    // renders the navigation page depending if its on selection mode (useCheckbox true) or not
+    const renderList = (useCheckbox) => {
+      ulItem.innerHTML = ""; //clear the list to prevent old elements from appearing
+      //changing the look of the add btn and select btn
+      useCheckbox
+        ? (selectBtn.innerHTML = "Cancel") &&
+          (addBtn.innerHTML = `<i class="ms-Icon ms-Icon--Delete ms-font-xl"></i>`)
+        : (selectBtn.innerHTML = `<i class="ms-Icon ms-Icon--MultiSelect ms-font-xl"></i>`) &&
+          (addBtn.innerHTML = `<i class="ms-Icon ms-Icon--Add ms-font-xl"></i>`);
+
+      subpages.forEach((subpage) => {
+        const subPgList = useCheckbox
+          ? `<li class="search-list"><div class="wrapper list-link">
+              <input class="checkbox" type="checkbox" id="checkbox-${subpage.Id}" name="" value="${subpage.title}">
+              <label for="checkbox-${subpage.Id}" style="width: 100%;">
+                <div class="search-result-text">
+                  <p>${subpage.title}</p>
+                  <div class="justify-end-wrapper">
+                    <p class="result-desc">${subpage.description != null ? subpage.description : "..."}</p>
+                    <p class="result-tag">${subpage.topic != null ? subpage.topic : ""}</p>
+                  </div>
+                </div>
+              </label>
+            </div></li>`
+          : `<li class="search-list"><a href="${subpage.Id != null ? "#subpage-" + subpage.Id : ""}" class="wrapper list-link">
           <i class="search-icon ms-Icon ms-Icon--${subpage.topic == "Troubleshooting" ? "SearchIssue" : subpage.topic == "Guides" ? "Help" : subpage.topic == "Informational" ? "Info" : subpage.topic == "Resources" ? "Download" : ""} ms-font-xl" aria-hidden="true"></i>
           <div class="search-result-text">
             <p>${subpage.title}</p>
             <div class="justify-end-wrapper">
-              <p class="result-desc">${subpage.description != null ? subpage.description : ""}</p>
+              <p class="result-desc">${subpage.description != null ? subpage.description : "..."}</p>
               <p class="result-tag">${subpage.topic != null ? subpage.topic : ""}</p>
             </div>
           </div>
         </a></li>`;
-      // `<li><a href="${subpage.Id != null ? "#subpage-" + subpage.Id : ""}">${subpage.title}</a></li>`;
-      const subPgUl = `<ul class="sub-listitem">${subPgList}</ul>`;
-      listContainer.insertAdjacentHTML("beforeend", subPgUl);
-    });
-    // TODO: UPDATE THIS
+        ulItem.insertAdjacentHTML("beforeend", subPgList);
+      });
+      if (useCheckbox) selectArticle();
+    };
+
+    renderList(selectBtnStatus === "true");
+
+    selectBtn.onclick = () => {
+      selectBtnStatus = selectBtnStatus === "true" ? "false" : "true";
+      selectBtn.dataset.selectionmode = selectBtnStatus;
+      addBtn.toggleAttribute("data-deleteMode");
+      renderList(selectBtnStatus === "true");
+    };
   } catch (err) {}
+}
+
+function selectArticle() {
+  const selectBtn = document.getElementById("select-btn");
+
+  const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  checkboxes.forEach((checkbox) => {
+    checkbox.addEventListener("change", () => {
+      const selected = [...document.querySelectorAll('input[type="checkbox"]:checked')].map(
+        (cb) => cb.value
+      );
+      console.log("Selected articles:", selected);
+    });
+  });
 }
 
 /**
@@ -520,7 +569,12 @@ Office.onReady((info) => {
   document.getElementById("back-btn-search").onclick = backButton;
   document.getElementById("back-btn-subpage").onclick = () => history.back();
 
-  document.getElementById("add-btn").onclick = () => showFormView("add");
+  const addButton = document.getElementById("add-btn");
+  addButton.onclick = () => {
+    if (!addButton.hasAttribute("data-deletemode")) {
+      showFormView("add");
+    }
+  };
 
   // yeah this function is a floppery if u reload on a subpage
   // copied and pasted from stackoverflow... sorry...

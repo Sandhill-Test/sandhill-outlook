@@ -67,12 +67,19 @@
             <i class="ms-Icon ms-Icon--Back ms-font-xl btn-icon"></i>
           </button>
           <h2 id="main-title-el" class="ms-font-l"></h2>
-          <button class="btn icon-btn btn-text" id="add-btn">
-            <i class="ms-Icon ms-Icon--Add ms-font-s"></i>
-            <span>Add</span>
-          </button>
+          <div class="wrapper">
+            <button class="btn icon-btn btn-text" id="select-btn" data-selectionmode="false">
+              <i class="ms-Icon ms-Icon--MultiSelect ms-font-xl"></i>
+            </button>
+            <button class="btn icon-btn btn-text" id="add-btn">
+              <i class="ms-Icon ms-Icon--Add ms-font-xl"></i>
+              <!-- <span>Add</span> -->
+            </button>
+          </div>
         </div>
-        <div id="searchpage-list-container" class="list-container"></div>
+        <div id="searchpage-list-container" class="list-container">
+          <ul id="ul-list-item" class="sub-listitem"></ul>
+        </div>
       </div>
 
       <div id="subpage-view" style="display: none">
