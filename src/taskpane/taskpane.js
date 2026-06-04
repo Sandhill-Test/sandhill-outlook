@@ -11,8 +11,7 @@
 import { initFormatButtons } from "./format.js";
 import * as editor from "./WYSIWYGeditor.js";
 
-// WARNING!!!!  WARNING!!!! WARNING!!!! WARNING!!!! WARNING!!!! WARNING!!!! WARNING!!!! WARNING!!!! WARNING!!!!
-
+// do a selection thing - select to bulk delete
 // TODO: do smth about the back btn function cuz it works quite sloppy when editing and pressing back - check if i did smth about it cuz i cant remember
 
 // add a delete article function?
@@ -178,7 +177,7 @@ async function renderSearchBarList(subpages) {
           (
             subpage
           ) => `<li class="search-list"><a href="${subpage.Id != null ? "#subpage-" + subpage.Id : ""}" class="wrapper list-link">
-          <i class="ms-Icon ms-Icon--${subpage.topic == "Troubleshooting" ? "SearchIssue" : subpage.topic == "Guides" ? "Help" : subpage.topic == "Informational" ? "Info" : subpage.topic == "Resources" ? "Download" : ""} ms-font-xl" aria-hidden="true"></i>
+          <i class="search-icon ms-Icon ms-Icon--${subpage.topic == "Troubleshooting" ? "SearchIssue" : subpage.topic == "Guides" ? "Help" : subpage.topic == "Informational" ? "Info" : subpage.topic == "Resources" ? "Download" : ""} ms-font-xl" aria-hidden="true"></i>
           <div class="search-result-text">
             <p>${subpage.title}</p>
             <div class="justify-end-wrapper">
@@ -212,7 +211,17 @@ async function renderSearchList(id) {
     const listContainer = document.getElementById("searchpage-list-container");
     listContainer.innerHTML = "";
     subpages.forEach((subpage) => {
-      const subPgList = `<li><a href="${subpage.Id != null ? "#subpage-" + subpage.Id : ""}">${subpage.title}</a></li>`;
+      const subPgList = `<li class="search-list"><a href="${subpage.Id != null ? "#subpage-" + subpage.Id : ""}" class="wrapper list-link">
+          <i class="search-icon ms-Icon ms-Icon--${subpage.topic == "Troubleshooting" ? "SearchIssue" : subpage.topic == "Guides" ? "Help" : subpage.topic == "Informational" ? "Info" : subpage.topic == "Resources" ? "Download" : ""} ms-font-xl" aria-hidden="true"></i>
+          <div class="search-result-text">
+            <p>${subpage.title}</p>
+            <div class="justify-end-wrapper">
+              <p class="result-desc">${subpage.description}</p>
+              <p class="result-tag">${subpage.topic}</p>
+            </div>
+          </div>
+        </a></li>`;
+      // `<li><a href="${subpage.Id != null ? "#subpage-" + subpage.Id : ""}">${subpage.title}</a></li>`;
       const subPgUl = `<ul class="sub-listitem">${subPgList}</ul>`;
       listContainer.insertAdjacentHTML("beforeend", subPgUl);
     });
