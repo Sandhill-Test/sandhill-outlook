@@ -10,6 +10,7 @@
  */
 import { initFormatButtons } from "./format.js";
 import * as editor from "./WYSIWYGeditor.js";
+import { showAlert } from "./utilscripts.js";
 
 // do a selection thing - select to bulk delete
 // TODO: do smth about the back btn function cuz it works quite sloppy when editing and pressing back - check if i did smth about it cuz i cant remember
@@ -182,7 +183,7 @@ async function renderSearchBarList(subpages) {
             <p>${subpage.title}</p>
             <div class="justify-end-wrapper">
               <p class="result-desc">${allPages.find((p) => p.Id == subpage.parentpg)?.name ?? ""}</p>
-              <p class="result-tag">${subpage.topic != null ? subpage.topic : ""}</p>
+              <p class="result-tag">${allTopics.find((t) => t.Id == subpage.topic)?.name ?? ""}</p>
             </div>
           </div>
         </a></li>`
@@ -234,7 +235,7 @@ async function renderSearchList(id, { switchView = true } = {}) {
                 <div class="search-result-text">
                   <p>${subpage.title}</p>
                   <div class="justify-end-wrapper">
-                    <p class="result-desc">${subpage.description != null ? subpage.description : "..."}</p>
+                    <p class="result-desc">${subpage.description ? subpage.description.replace(/<[^>]+>/g, "").trim() : "..."}</p>
                     <p class="result-tag">${subpage.topic != null ? subpage.topic : ""}</p>
                   </div>
                 </div>
@@ -248,8 +249,8 @@ async function renderSearchList(id, { switchView = true } = {}) {
             ${subpage.is_pinned ? `<i class="ms-Icon ms-Icon--PinnedSolid ms-font-m"></i>` : ""}
             </div>
             <div class="justify-end-wrapper">
-              <p class="result-desc">${subpage.description != null ? subpage.description : "..."}</p>
-              <p class="result-tag">${subpage.topic != null ? subpage.topic : ""}</p>
+              <p class="result-desc">${subpage.description ? subpage.description.replace(/<[^>]+>/g, "").trim() : "..."}</p>
+              <p class="result-tag">${subpage.topic != null ? subpage.topic : typeof subpage.topic === "number" ? allTopics.find((t) => t.Id == subpage.topic)?.name : ""}</p>  
             </div>
           </div>
         </a></li>`;
@@ -282,6 +283,11 @@ function selectArticle() {
 }
 
 async function deleteSubpages(ids) {
+  // TODO: FIX THIS LATER
+  const names = allSubpages.find((sp) => sp.Id == ids)?.name;
+  const msg = `Do you wish to delete ${names}?`;
+  const confirmed = await showAlert(msg);
+  if (!confirmed) return;
   try {
     await Promise.all(
       ids.map((id) =>
@@ -315,12 +321,12 @@ async function renderSubpage(id) {
     const subpage = await subpageFetchUtil(id);
 
     document.getElementById("title-el").innerText = subpage.title ?? "";
-    document.getElementById("desc-el").innerText = subpage.description ?? "";
+    document.getElementById("desc-el").innerHTML = subpage.description ?? "";
 
     const sympWrapper = document.getElementById("symp-wrapper");
     const sympEl = document.getElementById("symptoms-el");
     if (subpage.symptom) {
-      sympEl.innerText = subpage.symptom;
+      sympEl.innerHTML = subpage.symptom;
       sympWrapper.classList.remove("hidden");
       sympWrapper.classList.add("wrapper");
     } else {
@@ -441,7 +447,7 @@ function showMainView() {
 }
 
 /** @type {HTMLElement} The contenteditable element used as the WYSIWYG solution editor */
-const formSolution = document.getElementById("form-solution");
+// const formSolution = document.getElementById("form-solution");
 
 /**
  * Populates and displays the add/edit form view.
@@ -453,6 +459,7 @@ const formSolution = document.getElementById("form-solution");
 function showFormView(mode, subpage = null) {
   document.getElementById("form-title-el").innerText = mode === "edit" ? "Edit Entry" : "Add Entry";
   document.getElementById("form-title").value = subpage?.title ?? "";
+
   const descriptionData = subpage?.description ?? "";
   editor.setEditorContent("form-description", descriptionData);
 
@@ -461,13 +468,16 @@ function showFormView(mode, subpage = null) {
 
   const solutionData = subpage?.solution ?? "";
   editor.setEditorContent("basic-example", solutionData);
-  formSolution.innerHTML = subpage?.solution ?? "";
+  // formSolution.innerHTML = subpage?.solution ?? "";
 
   document.getElementById("form-product").value = subpage?.product ?? "";
 
   // TODO: MAKE THIS THE DEFAULT VALUE OF THE DROPDOWN
-
-  document.getElementById("form-topic").value = subpage?.topic ?? "";
+  console.log(subpage?.topic);
+  // idk how to not repeat this.
+  const topicId = allTopics.find((t) => t.name == subpage?.topic)?.Id;
+  document.getElementById("form-topic").value = topicId ?? "";
+  // mode === "edit" ? topicId : mode === "add" ? subpage.topic : "";
   document.getElementById("form-link").value = subpage?.officialpg_link ?? "";
   document.getElementById("form-error").style.display = "none";
 
@@ -482,8 +492,10 @@ function showFormView(mode, subpage = null) {
 function getTopicOptions(topics) {
   const topicSelector = document.getElementById("form-topic");
   topicSelector.innerHTML = topics
-    .map((tp) => `<option value="${tp.Id != null ? tp.Id : ""}">${tp.name}</option>`)
+    .map((tp) => `<option value="${tp.Id ?? ""}">${tp.name ?? ""}</option>`)
     .join("");
+  topicSelector.onchange = () => console.log("picked: ", topicSelector.value);
+  console.log(topicSelector);
 }
 /**
  * Validates and submits the form data to the API.
@@ -503,6 +515,7 @@ async function submitForm(mode, subpageId) {
     errorEl.style.display = "block";
     return;
   }
+  // const topicValue =document.getElementById("form-topic").value.trim()
 
   const body = {
     title,
@@ -512,14 +525,17 @@ async function submitForm(mode, subpageId) {
 
     solution: editor.getEditorContent("basic-example").trim() || null,
     product: document.getElementById("form-product").value.trim() || null,
+    // TODO : NOW
     topic: document.getElementById("form-topic").value.trim() || null,
     officialpg_link: document.getElementById("form-link").value.trim() || null,
     // TODO: REMOVE FORM IMG
   };
+  // here use the find stmt
 
   // TODO: add an alert? yes or no?
   try {
     let res, saved;
+    let topicParse;
     if (mode === "add") {
       body.parentpg = currentPageId;
       res = await fetch("https://localhost:3001/api/subpages", {
@@ -529,9 +545,16 @@ async function submitForm(mode, subpageId) {
       });
       saved = await res.json();
       if (!res.ok) throw new Error(saved.error ?? "Failed to save");
+      // console.log(topicParse);
+      topicParse = allTopics.find((t) => t.Id == saved.topic)?.name ?? "";
+
+      saved.topic = topicParse;
       allSubpages.push(saved);
+      console.log(saved);
       renderSearchList(currentPageId);
+      renderSearchBarList(allSubpages);
     } else {
+      // edit mode
       res = await fetch(`https://localhost:3001/api/subpages/${subpageId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -541,6 +564,12 @@ async function submitForm(mode, subpageId) {
       if (!res.ok) throw new Error(saved.error ?? "Failed to save");
       const idx = allSubpages.findIndex((sp) => sp.Id === subpageId);
       if (idx !== -1) allSubpages[idx] = saved;
+
+      if (typeof saved.topic === "number") {
+        topicParse = allTopics.find((t) => t.Id == saved.topic)?.name ?? "";
+        saved.topic = topicParse;
+      }
+
       renderSubpage(subpageId);
     }
   } catch (err) {
@@ -573,17 +602,21 @@ function initToggleButtons() {
 
 // TODO:maybe add a ranking idk like top 3 lol cuz the front page lowk has some nothingburgers from 2020..
 Office.onReady((info) => {
+  const inputs = document.querySelectorAll("input");
+  inputs.forEach((input) => {
+    input.setAttribute("autocomplete", "off");
+  });
   // const heading = () => {
   //   const element = document.createElement("h1");
   //   element.innerText = "TinyMCE Webpack demo";
   //   return element;
   // };
 
-  const editorArea = () => {
-    const element = document.getElementById("basic-example");
-    element.id = "editor";
-    return element;
-  };
+  // const editorArea = () => {
+  //   const element = document.getElementById("basic-example");
+  //   element.id = "editor";
+  //   return element;
+  // };
   // const parent = document.createElement("p");
   // parent.appendChild(editorArea());
   // document.body.appendChild(heading());
@@ -591,7 +624,7 @@ Office.onReady((info) => {
 
   editor.render();
   initToggleButtons();
-  initFormatButtons(formSolution);
+  // initFormatButtons(formSolution);
 
   document.getElementById("back-btn-search").onclick = backButton;
   document.getElementById("back-btn-subpage").onclick = () => history.back();
