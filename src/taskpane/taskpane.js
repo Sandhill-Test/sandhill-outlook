@@ -294,7 +294,7 @@ async function deleteSubpages(ids) {
     selectBtn.dataset.selectionmode = "false";
     addBtn.removeAttribute("data-deletemode");
     // renderSearchList(currentPageId); important tho
-    // ssh test
+    // ssh test  #1
   } catch (err) {
     console.error("Delete failed:", err);
   }
