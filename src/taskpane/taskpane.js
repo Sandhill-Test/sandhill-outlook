@@ -107,7 +107,7 @@ function renderResults(pages, subpages) {
     if (page.Id == 1) return;
     const hrefUtil = `#page-${page.Id}`;
     const pageSubpages = subpages.filter((sp) => sp.parentpg == page.Id);
-    const topSubpage = pageSubpages.slice(0, 3); //only shows the first 3 articles
+    const topSubpage = pageSubpages.slice(0, 5); //only shows the first 3 articles
 
     // creating the design for each section on the main page
     const subItems = topSubpage
@@ -227,7 +227,7 @@ async function renderSearchList(id) {
       subpages.forEach((subpage) => {
         const subPgList = useCheckbox
           ? `<li class="search-list"><div class="wrapper list-link">
-              <input class="checkbox" type="checkbox" id="checkbox-${subpage.Id}" name="" value="${subpage.title}">
+              <input class="checkbox" type="checkbox" id="checkbox-${subpage.Id}" name="" value="${subpage.Id}">
               <label for="checkbox-${subpage.Id}" style="width: 100%;">
                 <div class="search-result-text">
                   <p>${subpage.title}</p>
@@ -241,7 +241,10 @@ async function renderSearchList(id) {
           : `<li class="search-list"><a href="${subpage.Id != null ? "#subpage-" + subpage.Id : ""}" class="wrapper list-link">
           <i class="search-icon ms-Icon ms-Icon--${subpage.topic == "Troubleshooting" ? "SearchIssue" : subpage.topic == "Guides" ? "Help" : subpage.topic == "Informational" ? "Info" : subpage.topic == "Resources" ? "Download" : ""} ms-font-xl" aria-hidden="true"></i>
           <div class="search-result-text">
+          <div class="${subpage.is_pinned ? "justify-end-wrapper" : ""}">
             <p>${subpage.title}</p>
+            ${subpage.is_pinned ? `<i class="ms-Icon ms-Icon--PinnedSolid ms-font-m"></i>` : ""}
+            </div>
             <div class="justify-end-wrapper">
               <p class="result-desc">${subpage.description != null ? subpage.description : "..."}</p>
               <p class="result-tag">${subpage.topic != null ? subpage.topic : ""}</p>
@@ -265,17 +268,35 @@ async function renderSearchList(id) {
 }
 
 function selectArticle() {
-  const selectBtn = document.getElementById("select-btn");
-
   const checkboxes = document.querySelectorAll('input[type="checkbox"]');
   checkboxes.forEach((checkbox) => {
     checkbox.addEventListener("change", () => {
-      const selected = [...document.querySelectorAll('input[type="checkbox"]:checked')].map(
-        (cb) => cb.value
+      const selected = [...document.querySelectorAll('input[type="checkbox"]:checked')].map((cb) =>
+        parseInt(cb.value)
       );
-      console.log("Selected articles:", selected);
+      console.log("Selected article IDs:", selected);
     });
   });
+}
+
+async function deleteSubpages(ids) {
+  try {
+    await Promise.all(
+      ids.map((id) =>
+        fetch(`https://localhost:3001/api/subpages/${id}`, { method: "DELETE" }).then((res) => {
+          if (!res.ok) throw new Error(`Failed to delete subpage ${id}`);
+        })
+      )
+    );
+    allSubpages = allSubpages.filter((sp) => !ids.includes(Number(sp.Id)));
+    const selectBtn = document.getElementById("select-btn");
+    const addBtn = document.getElementById("add-btn");
+    selectBtn.dataset.selectionmode = "false";
+    addBtn.removeAttribute("data-deletemode");
+    // renderSearchList(currentPageId); important tho
+  } catch (err) {
+    console.error("Delete failed:", err);
+  }
 }
 
 /**
@@ -381,6 +402,14 @@ async function pinSubpg(id) {
 
     const pinIcon = document.getElementById("pin-icon");
     pinIcon.className = `ms-Icon ${pinned ? "ms-Icon--PinnedSolid" : "ms-Icon--Pinned"} ms-font-xl`;
+    const [pagesRes, subpagesRes] = await Promise.all([
+      fetch("https://localhost:3001/api/pages"),
+      fetch("https://localhost:3001/api/subpages"),
+    ]);
+    const pages = await pagesRes.json();
+    const subpages = await subpagesRes.json();
+    renderResults(pages, subpages);
+    renderSearchList(currentPageId);
   } catch (err) {
     console.error("pin toggle failed", err);
   }
@@ -481,7 +510,7 @@ async function submitForm(mode, subpageId) {
     title,
     // description: document.getElementById("form-description").value.trim() || null,
     description: editor.getEditorContent("form-description").trim() || null,
-    symptom: editor.getEditorContent("form-symptom").value.trim() || null,
+    symptom: editor.getEditorContent("form-symptom").trim() || null,
 
     solution: editor.getEditorContent("basic-example").trim() || null,
     product: document.getElementById("form-product").value.trim() || null,
@@ -570,8 +599,13 @@ Office.onReady((info) => {
   document.getElementById("back-btn-subpage").onclick = () => history.back();
 
   const addButton = document.getElementById("add-btn");
-  addButton.onclick = () => {
-    if (!addButton.hasAttribute("data-deletemode")) {
+  addButton.onclick = async () => {
+    if (addButton.hasAttribute("data-deletemode")) {
+      const ids = [...document.querySelectorAll('input[type="checkbox"]:checked')].map((cb) =>
+        parseInt(cb.value)
+      );
+      if (ids.length) await deleteSubpages(ids);
+    } else {
       showFormView("add");
     }
   };
