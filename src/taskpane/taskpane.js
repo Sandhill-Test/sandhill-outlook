@@ -293,8 +293,7 @@ async function deleteSubpages(ids) {
     const addBtn = document.getElementById("add-btn");
     selectBtn.dataset.selectionmode = "false";
     addBtn.removeAttribute("data-deletemode");
-    // renderSearchList(currentPageId); important tho
-    // repo test  #1
+    renderSearchList(currentPageId);
   } catch (err) {
     console.error("Delete failed:", err);
   }
