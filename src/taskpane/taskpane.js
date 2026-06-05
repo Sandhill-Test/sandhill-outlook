@@ -198,15 +198,17 @@ async function renderSearchBarList(subpages) {
  * @param {number} id - The ID of the parent page to display
  * @returns {Promise<void>}
  */
-async function renderSearchList(id) {
+async function renderSearchList(id, { switchView = true } = {}) {
   try {
     currentPageId = id;
-    const subpages = allSubpages.filter((sp) => sp.parentpg == id);
+    const subpages = allSubpages
+      .filter((sp) => sp.parentpg == id)
+      .sort((a, b) => (b.is_pinned ? 1 : 0) - (a.is_pinned ? 1 : 0));
     console.log(subpages);
 
     const page = allPages.find((p) => p.Id == id);
     document.getElementById("main-title-el").innerText = page?.name ?? "";
-    showView("searchpage-view");
+    if (switchView) showView("searchpage-view");
 
     const ulItem = document.getElementById("ul-list-item");
     ulItem.innerHTML = "";
@@ -402,14 +404,10 @@ async function pinSubpg(id) {
 
     const pinIcon = document.getElementById("pin-icon");
     pinIcon.className = `ms-Icon ${pinned ? "ms-Icon--PinnedSolid" : "ms-Icon--Pinned"} ms-font-xl`;
-    const [pagesRes, subpagesRes] = await Promise.all([
-      fetch("https://localhost:3001/api/pages"),
-      fetch("https://localhost:3001/api/subpages"),
-    ]);
-    const pages = await pagesRes.json();
-    const subpages = await subpagesRes.json();
-    renderResults(pages, subpages);
-    renderSearchList(currentPageId);
+
+    const entry = allSubpages.find((sp) => sp.Id == id);
+    if (entry) entry.is_pinned = pinned;
+    renderSearchList(currentPageId, { switchView: false });
   } catch (err) {
     console.error("pin toggle failed", err);
   }
