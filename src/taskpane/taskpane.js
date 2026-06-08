@@ -468,7 +468,7 @@ function showFormView(mode, subpage = null) {
   editor.setEditorContent("form-symptom", symptomData);
 
   const solutionData = subpage?.solution ?? "";
-  editor.setEditorContent("basic-example", solutionData);
+  editor.setEditorContent("form-solution", solutionData);
   // formSolution.innerHTML = subpage?.solution ?? "";
 
   document.getElementById("form-product").value = subpage?.product ?? "";
@@ -524,7 +524,7 @@ async function submitForm(mode, subpageId) {
     description: editor.getEditorContent("form-description").trim() || null,
     symptom: editor.getEditorContent("form-symptom").trim() || null,
 
-    solution: editor.getEditorContent("basic-example").trim() || null,
+    solution: editor.getEditorContent("form-solution").trim() || null,
     product: document.getElementById("form-product").value.trim() || null,
     // TODO : NOW
     topic: document.getElementById("form-topic").value.trim() || null,

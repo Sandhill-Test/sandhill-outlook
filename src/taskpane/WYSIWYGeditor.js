@@ -116,7 +116,7 @@ export function render() {
     `,
   };
   const solutionOpt = {
-    selector: "div#basic-example",
+    selector: "div#form-solution",
     menubar: true,
     plugins: "advlist code link image lists table save",
     toolbar: [
