@@ -482,7 +482,11 @@ function showFormView(mode, subpage = null) {
   document.getElementById("form-link").value = subpage?.officialpg_link ?? "";
   document.getElementById("form-error").style.display = "none";
 
-  document.getElementById("form-submit-btn").onclick = () => submitForm(mode, subpage?.Id ?? null);
+  const submitBtns = document.querySelectorAll(".form-submit");
+  submitBtns.forEach((btn) => {
+    btn.onclick = () => submitForm(mode, subpage?.Id ?? null);
+  });
+  // document.getElementById("form-submit-btn").onclick = () => submitForm(mode, subpage?.Id ?? null);
   document.getElementById("back-btn-form").onclick = () => {
     mode === "edit" ? showView("subpage-view") : showView("searchpage-view");
   };

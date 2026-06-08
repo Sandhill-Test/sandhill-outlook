@@ -126,7 +126,12 @@
           <button id="back-btn-form" class="btn icon-btn">
             <i class="ms-Icon ms-Icon--Cancel ms-font-xl btn-icon"></i>
           </button>
-          <h2 id="form-title-el" class="ms-font-l">Add Entry</h2>
+          <div class="wrapper">
+            <button id="form-submit-btn-nav" class="form-submit btn icon-btn">
+              <i class="ms-Icon ms-Icon--Save ms-font-xl btn-icon"></i>
+            </button>
+            <h2 id="form-title-el" class="ms-font-l">Add Entry</h2>
+          </div>
         </div>
         <div class="form-container">
           <div class="form-field">
@@ -168,62 +173,20 @@
           </div>
 
           <!-- solution area thing -->
-          <div class="wrapper-overline hidden">
-            <div class="form-field">
-              <!-- <label class="ms-font-s label">Solution</label> -->
-              <div
-                id="form-solution"
-                contenteditable="true"
-                class="ms-TextField-field wysiwyg-editor"
-              ></div>
-            </div>
-            <div class="text-btns">
-              <button id="bold-btn" class="icon-btn btn-icon" data-active="false">
-                <i class="ms-Icon ms-Icon--Bold ms-font-xl"></i>
-              </button>
-              <button id="italic-btn" class="icon-btn btn-icon" data-active="false">
-                <i class="ms-Icon ms-Icon--Italic ms-font-xl"></i>
-              </button>
-              <button id="underline-btn" class="icon-btn btn-icon" data-active="false">
-                <i class="ms-Icon ms-Icon--Underline ms-font-xl"></i>
-              </button>
-              <button id="strike-btn" class="icon-btn btn-icon" data-active="false">
-                <i class="ms-Icon ms-Icon--Strikethrough ms-font-xl"></i>
-              </button>
-              <button id="list-btn" class="icon-btn btn-icon" data-active="false">
-                <i class="ms-Icon ms-Icon--BulletedList ms-font-xl"></i>
-              </button>
-              <button id="ordered-list-btn" class="icon-btn btn-icon" data-active="false">
-                <i class="ms-Icon ms-Icon--NumberedList ms-font-xl"></i>
-              </button>
-              <div class="dropdown">
-                <button
-                  id="fontsize-btn"
-                  class="icon-btn btn-icon dropdown-btn"
-                  data-active="false"
-                >
-                  <i class="ms-Icon ms-Icon--FontSize ms-font-xl"></i>
-                </button>
-                <div class="dropdown-menu">
-                  <button data-font-active="false"></button>
-                </div>
-              </div>
 
-              <button id="pic-btn" class="icon-btn btn-icon" data-active="false">
-                <i class="ms-Icon ms-Icon--PictureLibrary ms-font-xl"></i>
-              </button>
-              <!-- TEMPORARY -->
-            </div>
-          </div>
           <div class="wrapper-overline">
             <!-- <textarea name="" id="basic-example"></textarea> -->
             <div name="" class="mce-form-body" id="form-solution"></div>
           </div>
 
           <p id="form-error" class="ms-font-s" style="color: #d13438; display: none"></p>
-          <button id="form-submit-btn" class="btn ms-Button ms-Button--primary">
-            <span class="ms-Button-label ms-font-m">Save</span>
+          <button id="form-submit-btn" class="form-submit btn icon-btn btn-text secondary-btn">
+            <i class="ms-Icon ms-Icon--Save ms-font-s"></i>
+            <span class="btn-icon-text">Save</span>
           </button>
+          <!-- <button id="form-submit-btn" class="btn ms-Button ms-Button--primary">
+            <span class="ms-Button-label ms-font-m">Save</span>
+          </button> -->
         </div>
       </div>
     </main>
