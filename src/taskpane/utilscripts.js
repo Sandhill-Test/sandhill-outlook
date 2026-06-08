@@ -9,7 +9,7 @@ export function showAlert(message) {
     msg.classList.add("msg");
     msg.textContent = message;
 
-    const [okBtn, noBtn] = ["OK", "NO"].map((label) => {
+    const [okBtn, noBtn] = ["OK", "CANCEL"].map((label) => {
       const btn = document.createElement("button");
       btn.textContent = label;
       btn.classList.add("alertbtn");

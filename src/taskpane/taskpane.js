@@ -302,6 +302,7 @@ async function deleteSubpages(ids) {
     selectBtn.dataset.selectionmode = "false";
     addBtn.removeAttribute("data-deletemode");
     renderSearchList(currentPageId);
+    renderResults(allPages, allSubpages);
   } catch (err) {
     console.error("Delete failed:", err);
   }
