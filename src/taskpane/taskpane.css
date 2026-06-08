@@ -322,6 +322,9 @@ b {
   justify-content: center;
   margin-right: 5px;
 }
+.symptom {
+  align-self: baseline;
+}
 input[type="text"],
 textarea {
   border: 0;
