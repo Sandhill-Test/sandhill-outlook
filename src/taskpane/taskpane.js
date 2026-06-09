@@ -8,7 +8,6 @@
  * @module taskpane
  * @description Main taskpane - data fetchng, page rendering, and navigation
  */
-import { initFormatButtons } from "./format.js";
 import * as editor from "./WYSIWYGeditor.js";
 import { showAlert } from "./utilscripts.js";
 
@@ -346,14 +345,6 @@ async function renderSubpage(id) {
       // solWrapper.classList.remove("wrapper");
     }
 
-    // const imgEl = document.getElementById("img-el");
-    // if (subpage.img) {
-    //   imgEl.src = subpage.img;
-    //   imgEl.style.display = "block";
-    // } else {
-    //   imgEl.style.display = "none";
-    // }
-
     // TODO: Update dates
     // additional fields - supposed to open up another panel or smth. TODO: might do smth similar for the edit functions idk yet
     const additionalFields = [
@@ -469,13 +460,9 @@ function showFormView(mode, subpage = null) {
 
   const solutionData = subpage?.solution ?? "";
   editor.setEditorContent("form-solution", solutionData);
-  // formSolution.innerHTML = subpage?.solution ?? "";
 
   document.getElementById("form-product").value = subpage?.product ?? "";
 
-  // TODO: MAKE THIS THE DEFAULT VALUE OF THE DROPDOWN
-  console.log(subpage?.topic);
-  // idk how to not repeat this.
   const topicId = allTopics.find((t) => t.name == subpage?.topic)?.Id;
   document.getElementById("form-topic").value = topicId ?? "";
   // mode === "edit" ? topicId : mode === "add" ? subpage.topic : "";
@@ -490,7 +477,6 @@ function showFormView(mode, subpage = null) {
   document.getElementById("back-btn-form").onclick = () => {
     mode === "edit" ? showView("subpage-view") : showView("searchpage-view");
   };
-  // turn btn to an X -> ppl think that it wont save, keep arrow -> ppl think it will save and u can go back to it
 
   showView("form-view");
 }
@@ -520,11 +506,10 @@ async function submitForm(mode, subpageId) {
     errorEl.style.display = "block";
     return;
   }
-  // const topicValue =document.getElementById("form-topic").value.trim()
 
   const body = {
     title,
-    // description: document.getElementById("form-description").value.trim() || null,
+
     description: editor.getEditorContent("form-description").trim() || null,
     symptom: editor.getEditorContent("form-symptom").trim() || null,
 
@@ -533,9 +518,7 @@ async function submitForm(mode, subpageId) {
     // TODO : NOW
     topic: document.getElementById("form-topic").value.trim() || null,
     officialpg_link: document.getElementById("form-link").value.trim() || null,
-    // TODO: REMOVE FORM IMG
   };
-  // here use the find stmt
 
   // TODO: add an alert? yes or no?
   try {
@@ -611,25 +594,9 @@ Office.onReady((info) => {
   inputs.forEach((input) => {
     input.setAttribute("autocomplete", "off");
   });
-  // const heading = () => {
-  //   const element = document.createElement("h1");
-  //   element.innerText = "TinyMCE Webpack demo";
-  //   return element;
-  // };
-
-  // const editorArea = () => {
-  //   const element = document.getElementById("basic-example");
-  //   element.id = "editor";
-  //   return element;
-  // };
-  // const parent = document.createElement("p");
-  // parent.appendChild(editorArea());
-  // document.body.appendChild(heading());
-  // document.body.appendChild(parent);
 
   editor.render();
   initToggleButtons();
-  // initFormatButtons(formSolution);
 
   document.getElementById("back-btn-search").onclick = backButton;
   document.getElementById("back-btn-subpage").onclick = () => history.back();
@@ -669,5 +636,4 @@ Office.onReady((info) => {
 });
 
 // TODO: - ENTIRE LIST OF ALL ARTICLES VIEW WHERE U CAN SORT THEM OUT AND FILTER?
-// fix the search function like rn bro
 // should i add key words
