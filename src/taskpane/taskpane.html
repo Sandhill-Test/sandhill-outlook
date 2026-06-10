@@ -45,6 +45,8 @@
           </button>
           <h2 id="main-title-el" class="ms-font-l"></h2>
           <div class="wrapper">
+            <!-- dropdown filter -->
+            <select name="filter-topics" id="filter-topic" class="form-label"></select>
             <button class="btn icon-btn btn-text" id="select-btn" data-selectionmode="false">
               <i class="ms-Icon ms-Icon--MultiSelect ms-font-xl"></i>
             </button>
@@ -86,7 +88,7 @@
           <div class="article-info">
             <p id="desc-el" class="ms-font-m"></p>
             <!-- <img id="img-el" style="width: 75%; display: none" /> -->
-            <div id="symp-wrapper" class="wrapper">
+            <div id="symp-wrapper" class="">
               <p id="symp-label" class="label article-label">Symptom:</p>
               <p id="symptoms-el"></p>
             </div>
@@ -119,30 +121,34 @@
             <label class="ms-font-s form-label">Description</label>
             <div id="form-description" class="mce-form-body" rows="3"></div>
           </div>
-          <div class="tinymce-form-field">
+          <div id="symp-wrapper-form" class="tinymce-form-field">
             <label class="ms-font-s form-label symptom">Symptom</label>
             <div id="form-symptom" class="mce-form-body" rows="2"></div>
           </div>
+
           <!-- additional info btn (might clean this up a bit later) -->
-          <button
-            id="additional-info-form"
-            class="btn icon-btn btn-text secondary-btn"
-            data-toggle-target="additional-info-form-field"
-          >
-            <i class="ms-Icon ms-Icon--Add ms-font-s"></i>
-            <span>Additional Info</span>
-          </button>
+          <div class="justify-end-wrapper">
+            <!-- additional info btn -->
+            <button
+              id="additional-info-form"
+              class="btn icon-btn btn-text secondary-btn"
+              data-toggle-target="additional-info-form-field"
+            >
+              <i class="ms-Icon ms-Icon--Add ms-font-s"></i>
+              <span>Additional Info</span>
+            </button>
+            <div class="form-field">
+              <!-- <label class="ms-font-s form-label">Topic</label> -->
+              <select name="topics" id="form-topic" class="form-label"></select>
+            </div>
+          </div>
           <!-- addtional info form section -->
           <div id="additional-info-form-field" class="additional-info-form-field hidden">
             <div class="form-field">
               <label class="ms-font-s form-label">Product</label>
               <input type="text" id="form-product" class="ms-TextField-field" />
             </div>
-            <div class="form-field">
-              <label class="ms-font-s form-label">Topic</label>
-              <!-- <input type="text" id="form-topic" class="ms-TextField-field" /> -->
-              <select name="topics" id="form-topic"></select>
-            </div>
+
             <div class="form-field">
               <label class="ms-font-s form-label">Official Page Link</label>
               <input type="text" id="form-link" class="ms-TextField-field" />

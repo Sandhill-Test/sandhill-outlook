@@ -34,6 +34,7 @@ let currentPageId = null;
 let currentSubpageId = null;
 
 // testing
+// TODO: REMOVE THIS FUNCTION
 
 async function printPinned() {
   try {
@@ -48,6 +49,24 @@ async function printPinned() {
   }
 }
 
+// TODO: FUNCTION TO GET THE RENDERS idk
+
+// function renderItems(toRender) {
+// switch (toRender){
+//   case mainPage:
+//      renderResults(allPages, allSubPages)
+//     break
+//   case subPage:
+//     renderSubpage()
+//     break
+//   case searchBarList:
+//     renderSearchBarList(allSubpages)
+//     break
+//   case searchList:
+//     renderSearchList()
+// }
+
+// }
 /**
  * Collects data from the Pages and Subpage tables in the database using the Fetch API.
  * Retries the connection up to `retries` times before logging an error. On success, calls {@link renderResults}.
@@ -204,7 +223,8 @@ async function renderSearchList(id, { switchView = true } = {}) {
     const subpages = allSubpages
       .filter((sp) => sp.parentpg == id)
       .sort((a, b) => (b.is_pinned ? 1 : 0) - (a.is_pinned ? 1 : 0));
-    console.log(subpages);
+    // console.log(subpages);
+    const filterSelector = document.getElementById("filter-topic");
 
     const page = allPages.find((p) => p.Id == id);
     document.getElementById("main-title-el").innerText = page?.name ?? "";
@@ -225,7 +245,7 @@ async function renderSearchList(id, { switchView = true } = {}) {
           (addBtn.innerHTML = `<i class="ms-Icon ms-Icon--Delete ms-font-xl"></i>`)
         : (selectBtn.innerHTML = `<i class="ms-Icon ms-Icon--MultiSelect ms-font-xl"></i>`) &&
           (addBtn.innerHTML = `<i class="ms-Icon ms-Icon--Add ms-font-xl"></i>`);
-
+      // TODO: CHANGE THIS TO A VARIABLE EG. THE FILTERED VER OR NOT?
       subpages.forEach((subpage) => {
         const subPgList = useCheckbox
           ? `<li class="search-list"><div class="wrapper list-link">
@@ -259,6 +279,10 @@ async function renderSearchList(id, { switchView = true } = {}) {
     };
 
     renderList(selectBtnStatus === "true");
+    filterSelector.onchange = () => {
+      const filterSP = subpages.filter((sp) => sp.topic == filterSelector.value);
+      renderList(selectBtnStatus === "true");
+    };
 
     selectBtn.onclick = () => {
       selectBtnStatus = selectBtnStatus === "true" ? "false" : "true";
@@ -307,6 +331,36 @@ async function deleteSubpages(ids) {
   }
 }
 
+// check topic and change labels
+// do i even need this ....
+
+function changeLabel(subpage, mode) {
+  const symptomWrappers = ["symp-wrapper", "symp-wrapper-form"];
+  const sympWIds = symptomWrappers.map((id) => document.getElementById(id));
+
+  // const symptomElements = ["symptoms-el", "form-symptom"];
+  // symptomElements.map((id) => document.getElementById(id)).innerHTML = subpage.symptom ?? "";
+
+  const topicSelector = document.getElementById("form-topic"); //make this global or smth
+  if (mode === "edit") {
+    subpage?.topic !== "Troubleshooting"
+      ? sympWIds[1].classList.add("hidden")
+      : sympWIds[1].classList.remove("hidden");
+  } else {
+    subpage.topic !== "Troubleshooting" || !subpage.symptom
+      ? sympWIds[0].classList.add("hidden")
+      : sympWIds[0].classList.remove("hidden");
+  }
+
+  // topicSelector.value !== "Troubleshooting" ||
+  // subpage.topic !== "Troubleshooting" ||
+  // !subpage.symptom
+  //   ? sympWIds.classList.add("hidden")
+  //   : sympWIds.classList.remove("hidden");
+
+  // topicSelector.value === "Guides"
+}
+
 /**
  * Fetches and renders a subpage in the subpage view by its ID.
  * Populates all content fields (title, description, symptoms, solution, image),
@@ -322,20 +376,27 @@ async function renderSubpage(id) {
 
     document.getElementById("title-el").innerText = subpage.title ?? "";
     document.getElementById("desc-el").innerHTML = subpage.description ?? "";
+    changeLabel(subpage, "view");
 
-    const sympWrapper = document.getElementById("symp-wrapper");
+    // const sympWrapper = document.getElementById("symp-wrapper");
     const sympEl = document.getElementById("symptoms-el");
-    if (subpage.symptom) {
-      sympEl.innerHTML = subpage.symptom;
-      sympWrapper.classList.remove("hidden");
-      sympWrapper.classList.add("wrapper");
-    } else {
-      sympWrapper.classList.add("hidden");
-      sympWrapper.classList.remove("wrapper");
-    }
+    sympEl.innerHTML = subpage?.symptom ?? "";
+    // const sympLabel = document.getElementById("symp-label")
+    // if (subpage.symptom) {
+    //   sympEl.innerHTML = subpage.symptom;
+    //   sympWrapper.classList.remove("hidden");
+    //   // sympWrapper.classList.add("wrapper");
+    // } else {
+    //   sympWrapper.classList.add("hidden");
+    //   sympWrapper.classList.remove("wrapper");
+    // }
 
     const solWrapper = document.getElementById("sol-wrapper");
     const solEl = document.getElementById("solution-el");
+    // TODO: REMOVE SOLUTIONS LABEL IF THE TOPIC === INFORMATIONAL
+    // TODO: ADD A WAY TO ATTACH A FILE
+    // TODO: UPDATE HYPERLINKS AND EMBED THEM TO TEXT
+
     if (subpage.solution) {
       solEl.innerHTML = subpage.solution;
       solWrapper.classList.remove("hidden");
@@ -455,6 +516,7 @@ function showFormView(mode, subpage = null) {
   const descriptionData = subpage?.description ?? "";
   editor.setEditorContent("form-description", descriptionData);
 
+  changeLabel(subpage, "edit");
   const symptomData = subpage?.symptom ?? "";
   editor.setEditorContent("form-symptom", symptomData);
 
@@ -464,8 +526,14 @@ function showFormView(mode, subpage = null) {
   document.getElementById("form-product").value = subpage?.product ?? "";
 
   const topicId = allTopics.find((t) => t.name == subpage?.topic)?.Id;
-  document.getElementById("form-topic").value = topicId ?? "";
-  // mode === "edit" ? topicId : mode === "add" ? subpage.topic : "";
+  const topicSelector = document.getElementById("form-topic");
+  topicSelector.value = topicId ?? "";
+  topicSelector.onchange = () => {
+    const selectedName = allTopics.find((t) => t.Id == topicSelector.value)?.name;
+    document
+      .getElementById("symp-wrapper-form")
+      .classList.toggle("hidden", selectedName !== "Troubleshooting");
+  };
   document.getElementById("form-link").value = subpage?.officialpg_link ?? "";
   document.getElementById("form-error").style.display = "none";
 
@@ -481,8 +549,13 @@ function showFormView(mode, subpage = null) {
   showView("form-view");
 }
 function getTopicOptions(topics) {
+  // TODO: REMOVE REPETITION AND ADD A DEFAULT VIEW
   const topicSelector = document.getElementById("form-topic");
+  const filterSelector = document.getElementById("filter-topic");
   topicSelector.innerHTML = topics
+    .map((tp) => `<option value="${tp.Id ?? ""}">${tp.name ?? ""}</option>`)
+    .join("");
+  filterSelector.innerHTML = topics
     .map((tp) => `<option value="${tp.Id ?? ""}">${tp.name ?? ""}</option>`)
     .join("");
   topicSelector.onchange = () => console.log("picked: ", topicSelector.value);

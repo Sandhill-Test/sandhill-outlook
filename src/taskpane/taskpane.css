@@ -285,7 +285,7 @@ b {
   font-weight: bold;
 }
 .hidden {
-  display: none;
+  display: none !important;
 }
 .wrapper {
   display: flex;
@@ -315,7 +315,8 @@ b {
   background-color: var(--neutralPrimaryAlt);
   border: 1px solid var(--neutralSecondary);
   border-radius: 5px;
-  width: 100px;
+  min-width: 100px;
+  width: auto;
   height: 35px;
   display: flex;
   align-items: center;
@@ -494,4 +495,14 @@ textarea:hover {
 }
 .btn-icon-text {
   padding-left: 10px;
+}
+#form-topic {
+  color: white;
+  /* padding: 10px; */
+  padding-bottom: 10px;
+
+  /* margin-top: 0 !important; */
+}
+#form-topic:hover {
+  background-color: var(--itemHover);
 }
