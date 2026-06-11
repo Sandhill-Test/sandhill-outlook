@@ -123,22 +123,22 @@ function renderResults(pages, subpages) {
 
   // ignores the main menu page (it's id = 1)
   pages.forEach((page) => {
-    if (page.Id == 1) return;
-    const hrefUtil = `#page-${page.Id}`;
-    const pageSubpages = subpages.filter((sp) => sp.parentpg == page.Id);
+    if (page.id == 1) return;
+    const hrefUtil = `#page-${page.id}`;
+    const pageSubpages = subpages.filter((sp) => sp.parentpg == page.id);
     const topSubpage = pageSubpages.slice(0, 5); //only shows the first 3 articles
 
     // creating the design for each section on the main page
     const subItems = topSubpage
-      .map((sp) => `<li><a href="${sp.Id != null ? "#subpage-" + sp.Id : ""}">${sp.title}</a></li>`)
+      .map((sp) => `<li><a href="${sp.id != null ? "#subpage-" + sp.id : ""}">${sp.title}</a></li>`)
       .join("");
 
     const listIcon =
-      page.Id == 2
+      page.id == 2
         ? "ms-Icon--Ribbon"
-        : page.Id == 3
+        : page.id == 3
           ? "ms-Icon--Repo"
-          : page.Id == 4
+          : page.id == 4
             ? "ms-Icon--WorkFlow"
             : "ms-Icon--Cancel";
 
@@ -195,13 +195,13 @@ async function renderSearchBarList(subpages) {
         .map(
           (
             subpage
-          ) => `<li class="search-list"><a href="${subpage.Id != null ? "#subpage-" + subpage.Id : ""}" class="wrapper list-link">
+          ) => `<li class="search-list"><a href="${subpage.id != null ? "#subpage-" + subpage.id : ""}" class="wrapper list-link">
           <i class="search-icon ms-Icon ms-Icon--${subpage.topic == "Troubleshooting" ? "SearchIssue" : subpage.topic == "Guides" ? "Help" : subpage.topic == "Informational" ? "Info" : subpage.topic == "Resources" ? "Download" : ""} ms-font-xl" aria-hidden="true"></i>
           <div class="search-result-text">
             <p>${subpage.title}</p>
             <div class="justify-end-wrapper">
-              <p class="result-desc">${allPages.find((p) => p.Id == subpage.parentpg)?.name ?? ""}</p>
-              <p class="result-tag">${allTopics.find((t) => t.Id == subpage.topic)?.name ?? ""}</p>
+              <p class="result-desc">${allPages.find((p) => p.id == subpage.parentpg)?.name ?? ""}</p>
+              <p class="result-tag">${allTopics.find((t) => t.id == subpage.topic)?.name ?? ""}</p>
             </div>
           </div>
         </a></li>`
@@ -220,69 +220,86 @@ async function renderSearchBarList(subpages) {
 async function renderSearchList(id, { switchView = true } = {}) {
   try {
     currentPageId = id;
-    const subpages = allSubpages
+
+    const pageSubpages = allSubpages
       .filter((sp) => sp.parentpg == id)
       .sort((a, b) => (b.is_pinned ? 1 : 0) - (a.is_pinned ? 1 : 0));
-    // console.log(subpages);
-    const filterSelector = document.getElementById("filter-topic");
 
-    const page = allPages.find((p) => p.Id == id);
+    const page = allPages.find((p) => p.id == id);
     document.getElementById("main-title-el").innerText = page?.name ?? "";
     if (switchView) showView("searchpage-view");
 
     const ulItem = document.getElementById("ul-list-item");
-    ulItem.innerHTML = "";
     const selectBtn = document.getElementById("select-btn");
-    let selectBtnStatus = selectBtn.dataset.selectionmode;
-    // console.log(selectBtnStatus);
     const addBtn = document.getElementById("add-btn");
-    // renders the navigation page depending if its on selection mode (useCheckbox true) or not
+    const filterSelector = document.getElementById("filter-topic");
+
+    let selectBtnStatus = selectBtn.dataset.selectionmode;
+
+    const getFilteredSubpages = () => {
+      const filterValue = filterSelector.value;
+      // console.log("fv", filterValue);
+
+      return filterValue ? pageSubpages.filter((sp) => sp.topic == filterValue) : pageSubpages;
+    };
+
     const renderList = (useCheckbox) => {
-      ulItem.innerHTML = ""; //clear the list to prevent old elements from appearing
-      //changing the look of the add btn and select btn
+      ulItem.innerHTML = "";
+      const subpages = getFilteredSubpages();
+
       useCheckbox
         ? (selectBtn.innerHTML = "Cancel") &&
           (addBtn.innerHTML = `<i class="ms-Icon ms-Icon--Delete ms-font-xl"></i>`)
         : (selectBtn.innerHTML = `<i class="ms-Icon ms-Icon--MultiSelect ms-font-xl"></i>`) &&
           (addBtn.innerHTML = `<i class="ms-Icon ms-Icon--Add ms-font-xl"></i>`);
-      // TODO: CHANGE THIS TO A VARIABLE EG. THE FILTERED VER OR NOT?
+
       subpages.forEach((subpage) => {
+        const topicIcon =
+          subpage.topic == "Troubleshooting"
+            ? "SearchIssue"
+            : subpage.topic == "Guides"
+              ? "Help"
+              : subpage.topic == "Informational"
+                ? "Info"
+                : subpage.topic == "Resources"
+                  ? "Download"
+                  : "";
+
         const subPgList = useCheckbox
           ? `<li class="search-list"><div class="wrapper list-link">
-              <input class="checkbox" type="checkbox" id="checkbox-${subpage.Id}" name="" value="${subpage.Id}">
-              <label for="checkbox-${subpage.Id}" style="width: 100%;">
+              <input class="checkbox" type="checkbox" id="checkbox-${subpage.id}" name="" value="${subpage.id}">
+              <label for="checkbox-${subpage.id}" style="width: 100%;">
                 <div class="search-result-text">
                   <p>${subpage.title}</p>
                   <div class="justify-end-wrapper">
                     <p class="result-desc">${subpage.description ? subpage.description.replace(/<[^>]+>/g, "").trim() : "..."}</p>
-                    <p class="result-tag">${subpage.topic != null ? subpage.topic : ""}</p>
+                    <p class="result-tag">${subpage.topic ?? ""}</p>
                   </div>
                 </div>
               </label>
             </div></li>`
-          : `<li class="search-list"><a href="${subpage.Id != null ? "#subpage-" + subpage.Id : ""}" class="wrapper list-link">
-          <i class="search-icon ms-Icon ms-Icon--${subpage.topic == "Troubleshooting" ? "SearchIssue" : subpage.topic == "Guides" ? "Help" : subpage.topic == "Informational" ? "Info" : subpage.topic == "Resources" ? "Download" : ""} ms-font-xl" aria-hidden="true"></i>
-          <div class="search-result-text">
-          <div class="${subpage.is_pinned ? "justify-end-wrapper" : ""}">
-            <p>${subpage.title}</p>
-            ${subpage.is_pinned ? `<i class="ms-Icon ms-Icon--PinnedSolid ms-font-m"></i>` : ""}
-            </div>
-            <div class="justify-end-wrapper">
-              <p class="result-desc">${subpage.description ? subpage.description.replace(/<[^>]+>/g, "").trim() : "..."}</p>
-              <p class="result-tag">${subpage.topic != null ? subpage.topic : typeof subpage.topic === "number" ? allTopics.find((t) => t.Id == subpage.topic)?.name : ""}</p>  
-            </div>
-          </div>
-        </a></li>`;
+          : `<li class="search-list"><a href="${subpage.id != null ? "#subpage-" + subpage.id : ""}" class="wrapper list-link">
+              <i class="search-icon ms-Icon ms-Icon--${topicIcon} ms-font-xl" aria-hidden="true"></i>
+              <div class="search-result-text">
+                <div class="${subpage.is_pinned ? "justify-end-wrapper" : ""}">
+                  <p>${subpage.title}</p>
+                  ${subpage.is_pinned ? `<i class="ms-Icon ms-Icon--PinnedSolid ms-font-m"></i>` : ""}
+                </div>
+                <div class="justify-end-wrapper">
+                  <p class="result-desc">${subpage.description ? subpage.description.replace(/<[^>]+>/g, "").trim() : "..."}</p>
+                  <p class="result-tag">${subpage.topic ?? ""}</p>
+                </div>
+              </div>
+            </a></li>`;
         ulItem.insertAdjacentHTML("beforeend", subPgList);
       });
+
       if (useCheckbox) selectArticle();
     };
 
     renderList(selectBtnStatus === "true");
-    filterSelector.onchange = () => {
-      const filterSP = subpages.filter((sp) => sp.topic == filterSelector.value);
-      renderList(selectBtnStatus === "true");
-    };
+
+    filterSelector.onchange = () => renderList(selectBtnStatus === "true");
 
     selectBtn.onclick = () => {
       selectBtnStatus = selectBtnStatus === "true" ? "false" : "true";
@@ -290,7 +307,9 @@ async function renderSearchList(id, { switchView = true } = {}) {
       addBtn.toggleAttribute("data-deleteMode");
       renderList(selectBtnStatus === "true");
     };
-  } catch (err) {}
+  } catch (err) {
+    console.error("Failed to render search list:", err);
+  }
 }
 
 function selectArticle() {
@@ -307,7 +326,7 @@ function selectArticle() {
 
 async function deleteSubpages(ids) {
   // TODO: FIX THIS LATER
-  const names = allSubpages.find((sp) => sp.Id == ids)?.name;
+  const names = allSubpages.find((sp) => sp.id == ids)?.name;
   const msg = `Do you wish to delete ${names}?`;
   const confirmed = await showAlert(msg);
   if (!confirmed) return;
@@ -319,7 +338,7 @@ async function deleteSubpages(ids) {
         })
       )
     );
-    allSubpages = allSubpages.filter((sp) => !ids.includes(Number(sp.Id)));
+    allSubpages = allSubpages.filter((sp) => !ids.includes(Number(sp.id)));
     const selectBtn = document.getElementById("select-btn");
     const addBtn = document.getElementById("add-btn");
     selectBtn.dataset.selectionmode = "false";
@@ -464,7 +483,7 @@ async function pinSubpg(id) {
     const pinIcon = document.getElementById("pin-icon");
     pinIcon.className = `ms-Icon ${pinned ? "ms-Icon--PinnedSolid" : "ms-Icon--Pinned"} ms-font-xl`;
 
-    const entry = allSubpages.find((sp) => sp.Id == id);
+    const entry = allSubpages.find((sp) => sp.id == id);
     if (entry) entry.is_pinned = pinned;
     renderSearchList(currentPageId, { switchView: false });
   } catch (err) {
@@ -525,11 +544,11 @@ function showFormView(mode, subpage = null) {
 
   document.getElementById("form-product").value = subpage?.product ?? "";
 
-  const topicId = allTopics.find((t) => t.name == subpage?.topic)?.Id;
+  const topicId = allTopics.find((t) => t.name == subpage?.topic)?.id;
   const topicSelector = document.getElementById("form-topic");
   topicSelector.value = topicId ?? "";
   topicSelector.onchange = () => {
-    const selectedName = allTopics.find((t) => t.Id == topicSelector.value)?.name;
+    const selectedName = allTopics.find((t) => t.id == topicSelector.value)?.name;
     document
       .getElementById("symp-wrapper-form")
       .classList.toggle("hidden", selectedName !== "Troubleshooting");
@@ -539,9 +558,9 @@ function showFormView(mode, subpage = null) {
 
   const submitBtns = document.querySelectorAll(".form-submit");
   submitBtns.forEach((btn) => {
-    btn.onclick = () => submitForm(mode, subpage?.Id ?? null);
+    btn.onclick = () => submitForm(mode, subpage?.id ?? null);
   });
-  // document.getElementById("form-submit-btn").onclick = () => submitForm(mode, subpage?.Id ?? null);
+  // document.getElementById("form-submit-btn").onclick = () => submitForm(mode, subpage?.id ?? null);
   document.getElementById("back-btn-form").onclick = () => {
     mode === "edit" ? showView("subpage-view") : showView("searchpage-view");
   };
@@ -553,11 +572,11 @@ function getTopicOptions(topics) {
   const topicSelector = document.getElementById("form-topic");
   const filterSelector = document.getElementById("filter-topic");
   topicSelector.innerHTML = topics
-    .map((tp) => `<option value="${tp.Id ?? ""}">${tp.name ?? ""}</option>`)
+    .map((tp) => `<option value="${tp.id ?? ""}">${tp.name ?? ""}</option>`)
     .join("");
-  filterSelector.innerHTML = topics
-    .map((tp) => `<option value="${tp.Id ?? ""}">${tp.name ?? ""}</option>`)
-    .join("");
+  filterSelector.innerHTML =
+    `<option value="">All</option>` +
+    topics.map((tp) => `<option value="${tp.name ?? ""}">${tp.name ?? ""}</option>`).join("");
   topicSelector.onchange = () => console.log("picked: ", topicSelector.value);
   console.log(topicSelector);
 }
@@ -607,7 +626,7 @@ async function submitForm(mode, subpageId) {
       saved = await res.json();
       if (!res.ok) throw new Error(saved.error ?? "Failed to save");
       // console.log(topicParse);
-      topicParse = allTopics.find((t) => t.Id == saved.topic)?.name ?? "";
+      topicParse = allTopics.find((t) => t.id == saved.topic)?.name ?? "";
 
       saved.topic = topicParse;
       allSubpages.push(saved);
@@ -623,11 +642,11 @@ async function submitForm(mode, subpageId) {
       });
       saved = await res.json();
       if (!res.ok) throw new Error(saved.error ?? "Failed to save");
-      const idx = allSubpages.findIndex((sp) => sp.Id === subpageId);
+      const idx = allSubpages.findIndex((sp) => sp.id === subpageId);
       if (idx !== -1) allSubpages[idx] = saved;
 
       if (typeof saved.topic === "number") {
-        topicParse = allTopics.find((t) => t.Id == saved.topic)?.name ?? "";
+        topicParse = allTopics.find((t) => t.id == saved.topic)?.name ?? "";
         saved.topic = topicParse;
       }
 
